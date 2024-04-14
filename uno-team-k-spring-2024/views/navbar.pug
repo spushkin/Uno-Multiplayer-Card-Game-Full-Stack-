@@ -1,0 +1,8 @@
+html
+  head
+  body
+    header
+      nav.navbar.navbar-light.bg-light.mx-3.justify-content-between
+        h1 player: &lt;%= username ? username : &apos;not registered&apos; %&gt;
+        form#logoutForm(action='/auth/logout', method='get')
+          button.btn.btn-danger(type='submit') Log Out

@@ -1,3 +1,4 @@
+const protect = require("./app-config/protect");
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
@@ -10,7 +11,9 @@ if (process.env.NODE_ENV === "development") {
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
-// const testsRouter = require("./routes/tests");
+const authRouter = require("./routes/auth");
+const lobbyRouter = require("./routes/lobby");
+const testsRouter = require("./routes/test");
 
 const app = express();
 
@@ -24,9 +27,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// public
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-// app.use("/tests", testsRouter);
+app.use("/tests", testsRouter);
+app.use("/auth", authRouter);
+
+// protected
+app.use("/lobby", protect, lobbyRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

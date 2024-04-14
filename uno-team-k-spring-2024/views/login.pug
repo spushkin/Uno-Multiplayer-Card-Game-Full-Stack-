@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+  body
+    .wrapper
+      .text-center
+        h1 Login here
+      .container
+        form#loginForm(action='/auth/login', method='post')
+          .mb-3
+            label.form-label(for='username')
+              | Username
+            input#loginUsername.form-control(type='text', name='username', placeholder='Enter your user name')
+          .mb-3
+            label.form-label(for='password')
+              | Password
+            input#loginPassword1.form-control(type='password', name='password', placeholder='Enter your user password')
+          button.btn.btn-primary(type='submit')
+            | Submit
+          a.link-primary(href='/auth/register', value='login')
+            | Sign Up
+  footer

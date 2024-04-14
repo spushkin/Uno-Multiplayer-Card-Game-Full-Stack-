@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+  body
+    .wrapper
+      .text-center
+        h1 Register here
+      .container
+        form#registrationForm(action='/auth/register', method='post')
+          .mb-3
+            label.form-label(for='username') Username
+            input#registrationUsername.form-control(type='text', name='username', placeholder='Enter your user name')
+          .mb-3
+            label.form-label(for='email') Email address
+            input#registrationEmail.form-control(type='email', name='email', placeholder='Enter your user email')
+          .mb-3
+            label.form-label(for='password') Password
+            input#registrationPassword1.form-control(type='password', name='password', placeholder='Enter your user password')
+          //
+            <div class="mb-3">
+            <label for="password2" class="form-label">Confirm password</label>
+            <input type="password" name="password2" class="form-control" id="registrationPassword2" placeholder="Confirm your user password">
+            </div>
+          button.btn.btn-primary(type='submit', value='register') Submit
+          a.link-primary(href='/auth/login') Login
