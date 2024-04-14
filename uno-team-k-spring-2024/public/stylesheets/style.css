@@ -30,6 +30,10 @@ footer {
 header {
 }
 
+.username {
+	font-style: italic;
+}
+
 a {
 	a {
 		color: #00b7ff;
@@ -49,18 +53,6 @@ a {
 
 	.container > form {
 		width: 100%;
-	}
-
-	.main {
-		flex: auto;
-		display: grid;
-		grid-template-columns: 3fr 1fr;
-		column-gap: 10px;
-	}
-
-	.main > * {
-		margin: 0;
-		padding: 0;
 	}
 
 	#registrationForm,
