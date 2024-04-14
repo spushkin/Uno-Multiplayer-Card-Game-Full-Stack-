@@ -29,7 +29,7 @@ const handleLogin =
 		request.session.userId = id;
 		request.session.username = username;
 
-		response.redirect("/lobby");
+		response.redirect("/homePage");
 	};
 
 const handleLoginError = (response, redirectUri) => (error) => {
