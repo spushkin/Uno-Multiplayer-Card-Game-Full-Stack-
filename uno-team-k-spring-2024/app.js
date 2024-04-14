@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === "development") {
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
-const homePageRouter = require("./routes/homePage");
+const homeRouter = require("./routes/home");
 const testsRouter = require("./routes/test");
 
 const app = express();
@@ -36,7 +36,7 @@ app.use("/tests", testsRouter);
 app.use("/auth", authRouter);
 
 // protected
-app.use("/homePage", protect, homePageRouter);
+app.use("/home", protect, homeRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
