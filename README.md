@@ -107,5 +107,11 @@ echo DATABASE_URL=postgres://`whoami`@localhost:5432/DATABASE_NAME >> .env
 Example of <code>.env</code>:<br>
 
 ```
-DATABASE_URL=postgres://aleksandr@localhost:5432/dbname
+DATABASE_URL=postgres://usernam@localhost:5432/DATABASE_NAME
+```
+
+# Run Datbase
+
+```
+ psql -d DATABASE_NAME
 ```
