@@ -1,18 +1,24 @@
 {
-  "name": "uno-team-k-spring-2024",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "node ./bin/www"
-  },
-  "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11",
-    "sequelize": "^6.37.3",
-    "sequelize-cli": "^6.6.2"
-  }
+	"name": "uno-team-k-spring-2024",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"start": "node ./bin/www",
+		"start:dev": "NODE_ENV=development DEBUG=APP_NAME:* nodemon ./bin/www",
+		"test": "mocha -r dotenv/config",
+		"db:create:migration": "npx sequelize migration:generate --name ",
+		"db:migrate": "npx sequelize db:migrate",
+		"postinstall": "npx sequelize db:migrate"
+	},
+	"dependencies": {
+		"cookie-parser": "~1.4.4",
+		"debug": "~2.6.9",
+		"express": "~4.16.1",
+		"http-errors": "~1.6.3",
+		"morgan": "~1.9.1",
+		"nodemon": "^3.1.0",
+		"pug": "2.0.0-beta11",
+		"sequelize": "^6.37.3",
+		"sequelize-cli": "^6.6.2"
+	}
 }
