@@ -1,12 +1,12 @@
 doctype html
 html
-  head
+  include head.pug
   body
     .wrapper
       .text-center
         h1 Login here
       .container
-        form#loginForm(action='/auth/login', method='post')
+        form(onsubmit='return true')#loginForm(action='/auth/login', method='post')
           .mb-3
             label.form-label(for='username')
               | Username
@@ -19,4 +19,4 @@ html
             | Submit
           a.link-primary(href='/auth/register', value='login')
             | Sign Up
-  footer
+  include footer.pug

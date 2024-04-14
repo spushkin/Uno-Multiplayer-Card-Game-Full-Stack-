@@ -6,7 +6,7 @@ const Users = require("../db/users");
 
 // TODO validate input
 router.get("/register", function (request, response, next) {
-	response.render("public/register", { title: "Register" });
+	response.render("register", { title: "Register" });
 });
 
 router.post("/register", (request, response) => {
@@ -19,7 +19,7 @@ router.post("/register", (request, response) => {
 
 /* GET login page. */
 router.get("/login", function (request, response, next) {
-	response.render("public/login", { title: "Login" });
+	response.render("login", { title: "Login" });
 });
 
 const handleLogin =
@@ -47,14 +47,19 @@ router.post("/login", (request, response) => {
 
 /* GET logout page. */
 router.get("/logout", function (request, response, next) {
-	request.session.destroy((err) => {
-		if (err) {
-			console.log({ err });
-			next(err);
-		}
+	if (request.session) {
+		request.session.destroy((err) => {
+			if (err) {
+				console.log({ err });
+				next(err);
+			}
 
+			response.redirect("/auth/login");
+		});
+	} else {
+		console.log("user not logged in");
 		response.redirect("/auth/login");
-	});
+	}
 });
 
 module.exports = router;

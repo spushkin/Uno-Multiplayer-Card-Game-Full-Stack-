@@ -1,6 +1,6 @@
 doctype html
 html
-  head
+  include head.pug
   body
     .wrapper
       .text-center
@@ -23,3 +23,4 @@ html
             </div>
           button.btn.btn-primary(type='submit', value='register') Submit
           a.link-primary(href='/auth/login') Login
+    include footer.pug
