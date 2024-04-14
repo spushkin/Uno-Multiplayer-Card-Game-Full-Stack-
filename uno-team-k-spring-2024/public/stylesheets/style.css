@@ -10,7 +10,7 @@
 	padding: 0;
 }
 
-button {
+body button {
 	border-radius: 0 !important;
 }
 
@@ -18,7 +18,11 @@ button {
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-between;
+	background-image: url(../images/background.jpeg);
+	background-image: -moz-linear-gradient();
+	background-size: cover;
+	background-position: 50% 0;
 }
 
 footer {
@@ -34,114 +38,54 @@ header {
 	font-style: italic;
 }
 
-a {
-	a {
-		color: #00b7ff;
-		color: rgb(0, 0, 255);
-	}
+.welcome-banner {
+}
 
-	.container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		flex: auto;
-		max-width: 100%;
-		padding: 0;
-		margin: 0;
-	}
+form {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
 
-	.container > form {
-		width: 100%;
-	}
+form > a,
+form > button {
+	margin: 1rem;
+}
 
-	#registrationForm,
-	#loginForm {
-		width: 100%;
-		max-width: 500px;
+@keyframes color-frame {
+	0% {
+		color: white;
 	}
+	15% {
+		color: yellow;
+	}
+	33% {
+		color: green;
+	}
+	52% {
+		color: red;
+	}
+	70% {
+		color: blue;
+	}
+	90% {
+		color: white;
+	}
+}
 
-	#registrationForm > button,
-	#loginForm > button {
-		margin-right: 10px;
-	}
+.welcome {
+	animation-name: color-frame;
+	animation-duration: 10s;
+	animation-iteration-count: infinite;
+	text-align: center;
+	padding: 3rem;
+	font-weight: 900;
+	border: 1px;
+	background-position: 50% 0;
+}
 
-	form {
-		max-width: 500px;
-	}
-
-	.chat {
-		border-left: 1px rgb(50, 50, 50) solid;
-		margin-right: 5px;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.table {
-		margin: 0 5px;
-		display: flex;
-		flex-direction: column;
-		min-width: 800px;
-	}
-
-	#leftMenu {
-		display: flex;
-	}
-
-	#createGame {
-		flex-grow: 1;
-	}
-
-	#joinGame {
-		flex-grow: 1;
-	}
-
-	#createGame > button,
-	#joinGame > button {
-		width: 100%;
-	}
-
-	#mainMenu {
-	}
-
-	#message-box {
-		flex-grow: 1;
-		border-bottom: rgb(50, 50, 50) solid 1px;
-		margin-bottom: 1px;
-	}
-
-	#inputBox {
-		display: flex;
-		flex-wrap: nowrap;
-	}
-
-	#inputBox > input {
-		width: 100%;
-		border: none;
-	}
-
-	#chatMenu {
-		display: flex;
-	}
-
-	#globalChat {
-		flex-grow: 1;
-	}
-
-	#privateChat {
-		flex-grow: 1;
-	}
-
-	#globalChat > button,
-	#privateChat > button {
-		width: 100%;
-	}
-
-	#welcomeLink {
-		font-size: 8rem;
-	}
-
-	#welcomeLink > a {
-		text-decoration: none;
-	}
+.username {
+	animation-name: colors2;
+	animation-duration: 10s;
+	animation-iteration-count: infinite;
 }

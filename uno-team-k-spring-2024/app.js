@@ -10,7 +10,6 @@ if (process.env.NODE_ENV === "development") {
 	require("dotenv").config();
 }
 
-const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const homeRouter = require("./routes/home");
@@ -30,13 +29,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(sessionInstance);
 
 // public
-app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/tests", testsRouter);
 app.use("/auth", authRouter);
 
 // protected
 app.use("/home", protect, homeRouter);
+
+app.use("/*", protect, homeRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
