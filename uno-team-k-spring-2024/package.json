@@ -15,14 +15,14 @@
 		"cookie-parser": "~1.4.4",
 		"debug": "~2.6.9",
 		"dotenv": "^16.4.5",
-		"express": "~4.16.1",
+		"express": "^4.19.2",
 		"express-session": "^1.18.0",
 		"http-errors": "~1.6.3",
 		"morgan": "~1.9.1",
 		"nodemon": "^3.1.0",
 		"pg-promise": "^11.6.0",
 		"prettier": "^3.2.5",
-		"pug": "2.0.0-beta11",
+		"pug": "^3.0.2",
 		"sequelize": "^6.37.3",
 		"sequelize-cli": "^6.6.2"
 	}
