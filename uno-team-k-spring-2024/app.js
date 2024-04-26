@@ -14,6 +14,7 @@ const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const homeRouter = require("./routes/home");
 const testsRouter = require("./routes/test");
+const chatRouter = require("./routes/chat");
 
 const app = express();
 
@@ -35,7 +36,9 @@ app.use("/auth", authRouter);
 
 // protected
 app.use("/home", protect, homeRouter);
+app.use("/chat", protect, chatRouter);
 
+// home router
 app.use("/*", protect, homeRouter);
 
 // catch 404 and forward to error handler

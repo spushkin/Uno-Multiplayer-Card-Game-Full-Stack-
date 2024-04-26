@@ -2,6 +2,9 @@ doctype html
 html
   include head.pug
   include navbar.pug
-  body.wrapper
-    h2 This is home
+  body
+    .wrapper
+      include chat.pug
+      .content
+        h2 This is home
   include footer.pug

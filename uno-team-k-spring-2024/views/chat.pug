@@ -1,0 +1,18 @@
+.chat
+  #chat-top
+    #globalChat
+      button GLOBAL
+
+  #chat-middle
+    #chats
+      #chat-global
+        template#message
+          .message-body
+            span.sender
+            span.content
+            small.time
+              span.timestamp.text-muted
+    #messages  
+
+  #chat-bottom.userId(class='userId-')
+    input#message-field(placeholder='...' type='text')
