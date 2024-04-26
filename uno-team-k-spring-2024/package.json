@@ -25,6 +25,7 @@
 		"prettier": "^3.2.5",
 		"pug": "^3.0.2",
 		"sequelize": "^6.37.3",
-		"sequelize-cli": "^6.6.2"
+		"sequelize-cli": "^6.6.2",
+		"socket.io": "^4.7.5"
 	}
 }
