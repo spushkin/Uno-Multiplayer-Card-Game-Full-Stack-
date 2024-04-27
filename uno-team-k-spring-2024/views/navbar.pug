@@ -3,7 +3,7 @@ html
   body
     header
       nav.navbar.navbar-light.bg-light.mx-3.justify-content-between
-        h2.username #{username}
+        h2.username #{"User: " + username}
         h2 Welcome to UNO game
         form#logoutForm(action='/auth/logout', method='get')
           button.btn.btn-danger(type='submit') Log Out
