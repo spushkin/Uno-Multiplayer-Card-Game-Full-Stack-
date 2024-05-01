@@ -2,11 +2,22 @@ const express = require("express");
 const router = express.Router();
 const Users = require("../db/users");
 
-/* GET register page. */
-
-// TODO validate input
+/* GET  pages. */
 router.get("/register", function (request, response, next) {
 	response.render("register", { title: "Register" });
+});
+
+router.get("/login", function (request, response, next) {
+	response.render("login", { title: "Login" });
+});
+
+/* POST  methods. */
+router.post("/login", (request, response) => {
+	const { username, password } = request.body;
+
+	Users.login({ username, password })
+		.then(handleLogin(request, response))
+		.catch(handleLoginError(response, "/auth/login"));
 });
 
 router.post("/register", (request, response) => {
@@ -17,11 +28,7 @@ router.post("/register", (request, response) => {
 		.catch(handleLoginError(response, "/auth/register"));
 });
 
-/* GET login page. */
-router.get("/login", function (request, response, next) {
-	response.render("login", { title: "Login" });
-});
-
+/* helpers */
 const handleLogin =
 	(request, response) =>
 	({ id, username }) => {
@@ -36,14 +43,6 @@ const handleLoginError = (response, redirectUri) => (error) => {
 	console.log({ error });
 	response.redirect(redirectUri);
 };
-
-router.post("/login", (request, response) => {
-	const { username, password } = request.body;
-
-	Users.login({ username, password })
-		.then(handleLogin(request, response))
-		.catch(handleLoginError(response, "/auth/login"));
-});
 
 /* GET logout page. */
 router.get("/logout", function (request, response, next) {

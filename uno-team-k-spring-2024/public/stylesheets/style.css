@@ -14,6 +14,14 @@ body button {
 	border-radius: 0 !important;
 }
 
+header {
+	background-color: red;
+}
+
+.navbar {
+	background-color: red !important;
+}
+
 .wrapper {
 	display: flex;
 	flex-direction: row;
