@@ -6,8 +6,49 @@ html
     .wrapper
       include chat.pug
       .content
-        form.mx-1(action='/test/start')
-          input.btn.btn-success.btn-lg.test-button(type='submit' value='test click')
+        #joinGame
+          h2 Private games:
+          //- form.mx-5.input-private-games(action='/home/join/test-private' method='post')
+          form.mx-5.input-private-games(action='/home/join/test-private' method='get')
+            .input-group.mb-3
+              span#inputGroup-sizing-default.input-group-text ENTER JOIN CODE
+              input.form-control(type='text' name='code' aria-label='Sizing example input' aria-describedby='inputGroup-sizing-default')
+              input.btn.btn-primary(type='submit' value='JOIN')
+          h2 Public games
+          //- mockk data
+          - var game1 = {"id": "1",  "number": "3",  "max_players": "5", "username": "test", "createdAt": "13:12", "isPrivate": "false"}
+          - var game2 = {"id": "2",  "number": "3",  "max_players": "5", "username": "test", "createdAt": "13:12",  "isPrivate": "false"}
+          - var game3 = {"id": "3",  "number": "3",  "max_players": "5", "username": "test", "createdAt": "13:12",  "isPrivate": "false"}
+          - var game4 = {"id": "4",  "number": "3",  "max_players": "5", "username": "test", "createdAt": "13:12",  "isPrivate": "false"}
+          - var game5 = {"id": "5",  "number": "3",  "max_players": "5", "username": "test", "createdAt": "13:12",  "isPrivate": "false"}
+          - var game6 = {"id": "6",  "number": "3",  "max_players": "5", "username": "test", "createdAt": "13:12",  "isPrivate": "false"}
+          - var values = [game1, game2, game3, game4, game5, game6, game1, game2, game3, game4, game5, game6];
+          // end mock data
+          .my-games
+            each n in values
+              if !isPrivate 
+                .my-game
+                  p
+                    b game id:
+                    br
+                    | #{n.id}
+                  p
+                    b seats:
+                    br
+                    | #{n.number} / #{n.max_players}
+                  p
+                    b owner:
+                    br
+                    i #{n.username}
+                  p
+                    b created 
+                    br
+                    | #{n.createdAt}
+                  //- form.mx-1(action='/home/join/test' method='post')
+                  form.mx-1(action='/home/join/test' method='get')
+                    input.btn.btn-success(type='submit' value='join')
+
+
 
 
           //h2 This is home
