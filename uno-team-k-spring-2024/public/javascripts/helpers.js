@@ -2,6 +2,7 @@ const socket = io();
 const loginForm = document.querySelector("#loginForm");
 const chooseForm = document.querySelector("#choose-form");
 const messageField = document.querySelector("#message-field");
+const testButton = document.querySelector(".test-button");
 
 if (loginForm) {
 	loginForm.addEventListener("submit", (e) => {
@@ -87,5 +88,13 @@ if (messageField) {
 		});
 
 		document.querySelector("#message-field").value = "";
+	});
+}
+
+if (testButton) {
+	testButton.addEventListener("click", (e) => {
+		e.preventDefault();
+		// add event listeners here
+		console.log("test button clicked");
 	});
 }

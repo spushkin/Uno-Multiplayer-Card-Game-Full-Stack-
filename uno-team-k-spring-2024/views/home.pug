@@ -6,6 +6,9 @@ html
     .wrapper
       include chat.pug
       .content
-          button.btn.btn-success.btn-lg.test-button(type='button') CLICK
+          form.mx-1(action='/test/start')
+            input.btn.btn-success.btn-lg.test-button(type='submit' value='test click')
+
+
           //h2 This is home
   include footer.pug
