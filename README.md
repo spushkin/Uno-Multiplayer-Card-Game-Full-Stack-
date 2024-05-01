@@ -1,4 +1,4 @@
-# UNO Game
+# UNO Multiplayer Card Game (Work in progress!)
 
 # Сontents
 
