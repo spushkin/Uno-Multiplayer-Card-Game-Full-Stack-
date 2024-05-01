@@ -22,11 +22,11 @@ body button {
 }
 
 header {
-	background-color: red;
+	background-color: #fa8a00;
 }
 
 .navbar {
-	background-color: red !important;
+	background-color: #fa8a00 !important;
 }
 
 .wrapper {
