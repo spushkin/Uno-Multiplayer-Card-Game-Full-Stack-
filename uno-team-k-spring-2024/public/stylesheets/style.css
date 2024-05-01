@@ -12,6 +12,13 @@
 
 body button {
 	border-radius: 0 !important;
+	cursor: pointer;
+}
+
+.test-button {
+	width: 30rem;
+	height: 20rem;
+	font-size: 5rem;
 }
 
 header {
@@ -39,6 +46,9 @@ header {
 
 .content {
 	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 footer {
@@ -205,15 +215,13 @@ a {
 	height: 40px;
 }
 
-.sender,
-.private-sender {
+.sender {
 	font-weight: 600;
 	width: 100%;
 	color: blue;
 }
 
-.content,
-.private-content {
+.content {
 	font-style: italic;
 	font-weight: 600;
 	word-break: break-all;
