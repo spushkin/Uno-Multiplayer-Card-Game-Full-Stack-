@@ -93,7 +93,7 @@ if (messageField) {
 
 if (testButton) {
 	testButton.addEventListener("click", (e) => {
-		e.preventDefault();
+		// e.preventDefault();
 		// add event listeners here
 		console.log("test button clicked");
 	});

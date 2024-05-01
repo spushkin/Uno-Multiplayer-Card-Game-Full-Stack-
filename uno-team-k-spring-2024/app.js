@@ -13,8 +13,8 @@ if (process.env.NODE_ENV === "development") {
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const homeRouter = require("./routes/home");
-const testsRouter = require("./routes/test");
 const chatRouter = require("./routes/chat");
+const testRouter = require("./routes/test");
 
 const app = express();
 
@@ -31,12 +31,12 @@ app.use(sessionInstance);
 
 // public
 app.use("/users", usersRouter);
-app.use("/tests", testsRouter);
 app.use("/auth", authRouter);
 
 // protected
 app.use("/home", protect, homeRouter);
 app.use("/chat", protect, chatRouter);
+app.use("/test", protect, testRouter);
 
 // home router
 app.use("/*", protect, homeRouter);
