@@ -283,3 +283,10 @@ a {
 #welcomeLink {
 	font-size: 8rem;
 }
+
+.nav-nav-buttons {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+}
