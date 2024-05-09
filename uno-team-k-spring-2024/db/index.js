@@ -21,7 +21,7 @@ const cleanUpGames = async () => {
           await t.none('DELETE FROM cards');
           await t.none('DELETE FROM game_cards');
           await t.none('DELETE FROM game_users');
-          
+
         });
         console.log('All specified tables cleared successfully');
       } catch (error) {
@@ -31,6 +31,7 @@ const cleanUpGames = async () => {
 
 // Execute the cleanup function on startup
 cleanUpGames();
+
 
 // Test the connection when starting up
 testConnection();
