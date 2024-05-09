@@ -1,9 +1,25 @@
 const express = require("express");
 const moment = require("moment");
-
+const crypto = require('crypto');
 const Games = require("../db/games");
 
 const router = express.Router();
+
+// const generateUniqueShortId(games) = (length = 6) => {
+//     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+//     let result = '';
+
+//     do {
+//         result = '';
+//         const bytes = crypto.randomBytes(length);
+//         for (let i = 0; i < bytes.length; i++) {
+//             result += characters[bytes[i] % characters.length];
+//         }
+//     } while (games.has(result)); // Ensure it's unique by checking against existing games
+
+//     return result;
+// };
+
 
 function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
