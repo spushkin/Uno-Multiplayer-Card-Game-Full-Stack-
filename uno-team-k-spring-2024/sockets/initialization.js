@@ -1,5 +1,5 @@
 const socketIO = require("socket.io");
-
+const Games = require("../db/games");
 const sessionMiddleware = require("../app-config/session");
 
 const Server = socketIO.Server;
@@ -20,13 +20,19 @@ const init = (httpServer, app) => {
 
     // Listen to connections and subscribe them to game channels
     io.on("connection", (socket) => {
+
         socket.on("joinGame", (gameId) => {
             socket.join(`game:${gameId}`);
         });
 
-        socket.on("leaveGame", (gameId) => {
+        socket.on("leaveGame", async ({ gameId, userId }) => {
             socket.leave(`game:${gameId}`);
-        });
+            const game = await Games.getGame({ game_id: gameId });
+            if (game.userId === parseInt(userId, 10)) {
+              await Games.cleanupGame({ gameId });
+              io.emit(`endGame:${gameId}`);
+            }
+          });
 
         // Handle game-specific chat messages
         socket.on("chatMessage", (data) => {

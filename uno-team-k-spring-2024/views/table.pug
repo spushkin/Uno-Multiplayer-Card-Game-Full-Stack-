@@ -1,3 +1,4 @@
+
 doctype html
 html
   include head.pug
@@ -7,6 +8,7 @@ html
       include chat.pug
       .content
         .main
+          span#userIdSpan(style="display: none") #{userId}
           span#gameIdSpan(style="display: none") #{gameId}
           span#seatSpan(style="display: none") #{seat}
 
@@ -32,7 +34,9 @@ html
               .takeBtn
                 button.btn.btn-primary.btn-lg#takeCard(type="button" disabled="disabled") Take card
 
- 
-  include footer.pug
-  script( src="/javascripts/game.js")
+              // Add the "Leave Game" button
+              .leaveGameBtn
+                button.btn.btn-danger.btn-lg#leaveGameButton(type="button") Leave Game
 
+  include footer.pug
+  script(src="/javascripts/game.js")
