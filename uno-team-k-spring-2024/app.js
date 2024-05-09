@@ -40,6 +40,8 @@ app.use("/chat", protect, chatRouter);
 app.use("/test", protect, testRouter);
 app.use("/play", protect, playRouter);
 
+
+
 // home router
 app.use("/*", protect, homeRouter);
 

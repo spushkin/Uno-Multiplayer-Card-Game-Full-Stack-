@@ -12,6 +12,26 @@ async function testConnection() {
     }
 }
 
+const cleanUpGames = async () => {
+    try {
+        // Start a transaction
+        await connection.tx(async (t) => {
+          // Execute multiple queries within the transaction
+          await t.none('DELETE FROM games');
+          await t.none('DELETE FROM cards');
+          await t.none('DELETE FROM game_cards');
+          await t.none('DELETE FROM game_users');
+          
+        });
+        console.log('All specified tables cleared successfully');
+      } catch (error) {
+        console.error('Error clearing tables:', error);
+      }
+  };
+
+// Execute the cleanup function on startup
+cleanUpGames();
+
 // Test the connection when starting up
 testConnection();
 
