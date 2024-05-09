@@ -6,7 +6,17 @@ html
         h2.username #{"User: " + username}
         h2 Welcome to UNO game
         div.nav-nav-buttons
+          form.mx-1(action="/home")
+            input.btn.btn-primary.btn-lg(type="submit" value="JOIN A GAME")
+
+          form.mx-1(action="/home/create")
+            input.btn.btn-primary.btn-lg(type="submit" value="CREATE A GAME")
+
+          form.mx-1(action="/home/mygames")
+            input.btn.btn-success.btn-lg(type="submit" value="My games")
+
           form.m-1(action='/home')
             input.btn.btn-primary.btn-lg(type='submit' value='Home')
+
           form#logoutForm(action='/auth/logout', method='get')
             button.btn.btn-danger(type='submit') Log Out

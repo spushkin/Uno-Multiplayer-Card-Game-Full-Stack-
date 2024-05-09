@@ -15,6 +15,7 @@ const authRouter = require("./routes/auth");
 const homeRouter = require("./routes/home");
 const chatRouter = require("./routes/chat");
 const testRouter = require("./routes/test");
+const playRouter = require("./routes/play");
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/auth", authRouter);
 app.use("/home", protect, homeRouter);
 app.use("/chat", protect, chatRouter);
 app.use("/test", protect, testRouter);
+app.use("/play", protect, playRouter);
 
 // home router
 app.use("/*", protect, homeRouter);

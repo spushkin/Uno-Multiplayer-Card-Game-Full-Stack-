@@ -1,0 +1,38 @@
+doctype html
+html
+  include head.pug
+  include navbar.pug
+  body
+    .wrapper
+      include chat.pug
+      .content
+        .main
+          span#gameIdSpan(style="display: none") #{gameId}
+          span#seatSpan(style="display: none") #{seat}
+
+          .gameTable
+            .tableMes
+              h1 Table ##{gameId}
+            #board
+              p#actions
+              p#turnText Loading...
+              .currentC
+                p#currentCard
+              h2 Play card:
+              #selfCards
+              .wildCard
+                .alert.alert-secondary
+                  p
+                    i Pick color for a WILD (GREY) card:
+                select(name="color" id="color")
+                  option(value="red" selected="selected") Red
+                  option(value="blue") Blue
+                  option(value="green") Green
+                  option(value="yellow") Yellow
+              .takeBtn
+                button.btn.btn-primary.btn-lg#takeCard(type="button" disabled="disabled") Take card
+
+ 
+  include footer.pug
+  script( src="/javascripts/game.js")
+
