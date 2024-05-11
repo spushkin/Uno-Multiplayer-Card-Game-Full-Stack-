@@ -13,17 +13,17 @@ html
           
           #lobby
           h1 Lobby
-          // Display game information, players, etc.
           p Game ID: #{gameId}
           p Max Players: #{maxPlayers}
           p Current Players: #{players.length}
-          //- ul
-          //-   each player in players
-          //-     li= player.user_id
+
+          ul
+            each player in players
+              li= player.user_id
           
           // Add the "Leave Game" button
           .leaveGameBtn
-            button.btn.btn-danger.btn-lg#leaveGameButton(type="button") Leave Game
+            button.btn.btn-danger.btn-lg#leaveGameButtonOwner(type="button") Leave Game
 
   include footer.pug
   script(src="/javascripts/lobby.js")

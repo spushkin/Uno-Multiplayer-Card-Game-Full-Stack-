@@ -13,13 +13,13 @@ html
           
           #lobby
           h1 Lobby
-          // Display game information, players, etc.
           p Game ID: #{gameId}
           p Max Players: #{maxPlayers}
           p Current Players: #{players.length}
-          //- ul
-          //-   each player in players
-          //-     li= player.user_id
+
+          ul
+            each player in players
+              li= player.user_id
 
           // Add the "start Game" button
           form(action="/home/startGame/" + gameId method="post")
