@@ -27,12 +27,18 @@ const init = (httpServer, app) => {
 
         socket.on("leaveGame", async ({ gameId, userId }) => {
             socket.leave(`game:${gameId}`);
-            const game = await Games.getGame({ game_id: gameId });
-            if (game.userId === parseInt(userId, 10)) {
-              await Games.cleanupGame({ gameId });
-              io.emit(`endGame:${gameId}`);
-            }
+            await Games.removePlayerFromGame({ gameId, userId});
+            await Games.decreasePlayerCount({ gameId});
           });
+
+        socket.on("leaveGameOwner", async ({ gameId, userId }) => {
+        socket.leave(`game:${gameId}`);
+        const game = await Games.getGame({ game_id: gameId });
+        if (game.userId === parseInt(userId, 10)) {
+            await Games.cleanupGame({ gameId });
+            io.emit(`endGame:${gameId}`);
+        }
+        });
 
         // Handle game-specific chat messages
         socket.on("chatMessage", (data) => {
@@ -50,9 +56,7 @@ const init = (httpServer, app) => {
         
         socket.on('startGame', ({ gameId }) => {
             // Perform validation and start the game
-            Games.startGame({ gameId }).then(() => {
-              io.emit(`gameStarted:${gameId}`);
-            });
+            io.to(`game:${gameId}`).emit('gameStarted', { gameId });
         });
     });
 

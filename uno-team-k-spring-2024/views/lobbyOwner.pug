@@ -6,21 +6,28 @@ html
     .wrapper
       include chat.pug
       .content
-        #lobby
-        
+        .main
+          span#userIdSpan(style="display: none") #{userId}
+          span#gameIdSpan(style="display: none") #{gameId}
+          span#seatSpan(style="display: none") #{seat}
+          
+          #lobby
           h1 Lobby
           // Display game information, players, etc.
           p Game ID: #{gameId}
           p Max Players: #{maxPlayers}
-          p Current Players: #{numberOfPlayers}
+          p Current Players: #{players.length}
+          //- ul
+          //-   each player in players
+          //-     li= player.user_id
 
-          // Start game button (visible only to the game creator)
-          form(action=`/home/startGame/${gameId}` method="post")
-            button.btn.btn-success(type="submit") Start Game 
-
+          // Add the "start Game" button
+          form(action="/home/startGame/" + gameId method="post")
+              button.btn.btn-primary(type="submit") Start Game
+          
           // Add the "Leave Game" button
           .leaveGameBtn
-            button.btn.btn-danger.btn-lg#leaveGameButton(type="button") Leave Game
+            button.btn.btn-danger.btn-lg#leaveGameButtonOwner(type="button") Leave Game
 
   include footer.pug
-  script(src="/javascripts/game.js")
+  script(src="/javascripts/lobby.js")

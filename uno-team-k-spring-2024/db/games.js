@@ -25,6 +25,12 @@ const ADD_USER_SQL =
 	"INSERT INTO game_users (game_id, user_id, seat) VALUES (${game_id}, ${userId}, " +
 	"(SELECT (SELECT COALESCE((SELECT seat FROM game_users WHERE game_id = ${game_id} ORDER BY seat DESC LIMIT 1), 0))+1)) RETURNING game_id";
 
+const REMOVE_USER_SQL =
+	"DELETE FROM game_users WHERE game_id = ${gameId} AND user_id=${user_id}";
+
+const DECREASE_GAME_PLAYERS_COUNT =
+	"update games set number=number-1 where id=${game_id}";
+
 const GET_GAME = "SELECT * FROM games WHERE id = ${game_id}";
 
 const LOOKUP_USER_IN_GAMEUSERS_BY_ID =
@@ -47,6 +53,7 @@ const GET_CURRENT_PLAYER =
 
 const SET_CURRENT_SEAT =
 	"UPDATE game_users SET current = ${current} WHERE game_id = ${gameId} AND seat = ${seat}";
+
 
 const GET_PLAYER_SEAT =
 	"SELECT seat FROM game_users WHERE game_id=${game_id} AND user_id=${user_id};";
@@ -89,9 +96,19 @@ const UPDATE_GAME_DIRECTION =
 const UPDATE_GAME_LAST_COLOR_PICKED =
 	"update games set last_color_picked=${lastColorPicked} where id=${gameId}";
 
-const JOIN_LOBBY_SQL = "INSERT INTO game_users (game_id, user_id, seat, in_lobby) VALUES (${gameId}, ${userId}, 0, true)";
+const GET_PLAYERS_BY_GAME_ID = 
+	"SELECT user_id FROM game_users WHERE game_id = ${gameId}";
 
-const START_GAME_SQL = "UPDATE games SET game_started = true WHERE id = ${gameId}";
+const getPlayersByGameId = ({ gameId }) => {
+	return db.any(GET_PLAYERS_BY_GAME_ID, { gameId })
+		.then(players => {
+		return players;
+		})
+		.catch(err => {
+		console.error('Error fetching players by game ID:', err);
+		throw err; // Rethrow the error to be handled by the calling function
+		});
+	};
 
 const createPublicGame = ({ userId, maxPlayers }) => {
 	return db
@@ -249,6 +266,16 @@ const getPlayerSeat = ({ gameId, userId }) => {
 	});
 };
 
+const removePlayerFromGame = ({ gameId, userId }) => {
+	return db.result(REMOVE_USER_SQL, { gameId: gameId, user_id: userId });
+
+};
+
+const decreasePlayerCount = ({ gameId}) => {
+	return db
+		.result(DECREASE_GAME_PLAYERS_COUNT, { game_id: gameId })
+};
+
 const getCurrentSeat = ({ gameId }) => {
 	return db.one(GET_CURRENT_SEAT, {
 		game_id: gameId,
@@ -312,23 +339,9 @@ const updateGameLastColorPicked = ({ gameId, lastColorPicked }) => {
 	return db.any(UPDATE_GAME_LAST_COLOR_PICKED, { gameId, lastColorPicked });
 };
 
-const joinLobby = async ({ userId, gameId }) => {
-    try {
-        await db.none(JOIN_LOBBY_SQL, { gameId, userId });
-    } catch (error) {
-        throw new Error("Failed to join the lobby.");
-    }
-};
-
-const startGame = async ({ gameId }) => {
-    try {
-        await db.none(START_GAME_SQL, { gameId });
-    } catch (error) {
-        throw new Error("Failed to start the game.");
-    }
-};
-
 module.exports = {
+	decreasePlayerCount,
+	getPlayersByGameId,
 	getAllJoinableGames,
 	countPlayers,
 	getMyGames,
@@ -355,6 +368,5 @@ module.exports = {
 	getCard,
 	updateGameDirection,
 	updateGameLastColorPicked,
-	joinLobby,
-	startGame
+	removePlayerFromGame
 };
