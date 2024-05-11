@@ -44,47 +44,47 @@ router.get("/", (request, response) => {
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
-router.get("/mygames", (request, response) => {
-	const { username, userId } = request.session;
+// router.get("/mygames", (request, response) => {
+// 	const { username, userId } = request.session;
 
-	Games.getMyGames({ userId })
-		.then((games) => {
-			games.forEach((game) => {
-				game.createdAt = moment(game.createdAt).fromNow();
-			});
+// 	Games.getMyGames({ userId })
+// 		.then((games) => {
+// 			games.forEach((game) => {
+// 				game.createdAt = moment(game.createdAt).fromNow();
+// 			});
 
-			let tt = games ? games : [];
+// 			let tt = games ? games : [];
 
-			response.render("my-games", {
-				username,
-				userId,
-				games: games ? games : [],
-				title: "Active Games",
-			});
-		})
+// 			response.render("my-games", {
+// 				username,
+// 				userId,
+// 				games: games ? games : [],
+// 				title: "Active Games",
+// 			});
+// 		})
 
-		.catch(handleNewPublicGameError(response, "/home"));
-});
+// 		.catch(handleNewPublicGameError(response, "/home"));
+// });
 
-router.get("/create", (request, response) => {
-	const { username, userId } = request.session;
+// router.get("/create", (request, response) => {
+// 	const { username, userId } = request.session;
 
-	Games.getGamesByUserId({ userId })
-		.then((games) => {
-			games.forEach((game) => {
-				game.createdAt = moment(game.createdAt).fromNow();
-			});
+// 	Games.getGamesByUserId({ userId })
+// 		.then((games) => {
+// 			games.forEach((game) => {
+// 				game.createdAt = moment(game.createdAt).fromNow();
+// 			});
 
-			response.render("create-main", {
-				username,
-				userId,
-				games: games ? games : [],
-				title: "Home",
-			});
-		})
+// 			response.render("create-main", {
+// 				username,
+// 				userId,
+// 				games: games ? games : [],
+// 				title: "Home",
+// 			});
+// 		})
 
-		.catch(handleNewPublicGameError(response, "/home"));
-});
+// 		.catch(handleNewPublicGameError(response, "/home"));
+// });
 
 const handleNewPublicGameError = (response, redirectUri) => (error) => {
 	console.log({ error });
@@ -92,14 +92,14 @@ const handleNewPublicGameError = (response, redirectUri) => (error) => {
 };
 
 router.post("/generatePublicGame", (request, response) => {
-	const { userId } = request.session;
-	const { maxPlayers } = request.body;
+    const { userId } = request.session;
+    const { maxPlayers } = request.body;
 
-	Games.createPublicGame({ userId, maxPlayers })
-		.then((res) => {
-			response.redirect(`/home/game/` + res);
-		})
-		.catch(handleNewPublicGameError(response, "/home"));
+    Games.createPublicGame({ userId, maxPlayers })
+        .then((res) => {
+            response.redirect(`/home/lobby/${res}`);
+        })
+        .catch(handleNewPublicGameError(response, "/home"));
 });
 
 router.post("/generatePrivateGame", (request, response) => {
@@ -125,15 +125,78 @@ router.post("/joinPrivateGame", (request, response) => {
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
-router.post("/join/:id", (request, response) => {
-	const { userId } = request.session;
-	const gameId = request.params.id;
+router.post("/join/:id", async (request, response) => {
+	const { username, userId } = request.session;
 
-	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
-		.then((res) => {
-			response.redirect(`/home/game/${gameId}`);
-		})
-		.catch(handleNewPublicGameError(response, "/home"));
+	const gameId = request.params.id;
+	const game = await Games.getGame({
+		game_id: gameId,
+	});
+
+	let gameStarted = (await Games.gameStarted({ gameId })).length > 0;
+
+	if (game.number === game.max_players && !gameStarted) {
+		await Games.updateSeatState({
+			gameId,
+			seat: 1,
+			current: true,
+		});
+	}
+
+  
+	try {
+	  await Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) });
+
+	  response.render("lobby", {
+        username: username,
+        title: "Lobby",
+        userId: userId,
+        gameId: gameId,
+        seat: 1,
+        maxPlayers: game.max_players,
+    });
+	} catch (error) {
+	  response.status(500).send(error.message);
+	}
+  });
+
+// router.post("/joinLobby/:id", async (request, response) => {
+//     const { userId } = request.session;
+//     const gameId = request.params.id;
+
+//     await Games.joinLobby({ userId, gameId });
+
+//     response.redirect(`/home/lobby/${gameId}`);
+// });
+
+router.post("/startGame/:id", async (request, response) => {
+    const gameId = request.params.id;
+
+    await Games.startGame({ gameId });
+
+    response.redirect(`/home/game/${gameId}`);
+});
+
+router.get("/lobby/:id", async (request, response) => {
+    const { username, userId } = request.session;
+    const gameId = request.params.id;
+
+    const game = await Games.getGame({ game_id: gameId });
+    const userSeat = await Games.getPlayerSeat({ gameId, userId });
+	console.log(userSeat);
+    if (!game) {
+        // Handle invalid game ID
+        return response.redirect("/home");
+    }
+
+    response.render("lobbyOwner", {
+        username: username,
+        title: "Lobby",
+        userId: userId,
+        gameId: gameId,
+        seat: userSeat.seat,
+        maxPlayers: game.max_players,
+    });
 });
 
 router.get("/game/:id", async (request, response) => {

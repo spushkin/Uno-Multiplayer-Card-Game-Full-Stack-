@@ -89,6 +89,10 @@ const UPDATE_GAME_DIRECTION =
 const UPDATE_GAME_LAST_COLOR_PICKED =
 	"update games set last_color_picked=${lastColorPicked} where id=${gameId}";
 
+const JOIN_LOBBY_SQL = "INSERT INTO game_users (game_id, user_id, seat, in_lobby) VALUES (${gameId}, ${userId}, 0, true)";
+
+const START_GAME_SQL = "UPDATE games SET game_started = true WHERE id = ${gameId}";
+
 const createPublicGame = ({ userId, maxPlayers }) => {
 	return db
 		.one(CREATE_PUBLIC, { userId: userId, maxPlayers })
@@ -308,6 +312,22 @@ const updateGameLastColorPicked = ({ gameId, lastColorPicked }) => {
 	return db.any(UPDATE_GAME_LAST_COLOR_PICKED, { gameId, lastColorPicked });
 };
 
+const joinLobby = async ({ userId, gameId }) => {
+    try {
+        await db.none(JOIN_LOBBY_SQL, { gameId, userId });
+    } catch (error) {
+        throw new Error("Failed to join the lobby.");
+    }
+};
+
+const startGame = async ({ gameId }) => {
+    try {
+        await db.none(START_GAME_SQL, { gameId });
+    } catch (error) {
+        throw new Error("Failed to start the game.");
+    }
+};
+
 module.exports = {
 	getAllJoinableGames,
 	countPlayers,
@@ -335,4 +355,6 @@ module.exports = {
 	getCard,
 	updateGameDirection,
 	updateGameLastColorPicked,
+	joinLobby,
+	startGame
 };

@@ -1,0 +1,23 @@
+doctype html
+html
+  include head.pug
+  include navbar.pug
+  body
+    .wrapper
+      include chat.pug
+      .content
+        #lobby
+        
+          h1 Lobby
+          // Display game information, players, etc.
+          p Game ID: #{gameId}
+          p Max Players: #{maxPlayers}
+          p Current Players: #{numberOfPlayers}
+
+          // Add the "Leave Game" button
+        .leaveGameBtn
+            button.btn.btn-danger.btn-lg#leaveGameButton(type="button") Leave Game
+
+     
+  include footer.pug
+  script(src="/javascripts/game.js")

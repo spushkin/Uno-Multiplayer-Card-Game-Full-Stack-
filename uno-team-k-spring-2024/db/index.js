@@ -1,3 +1,4 @@
+require("dotenv").config();
 const pgp = require("pg-promise")();
 const connection = pgp(process.env.DATABASE_URL);
 
@@ -29,11 +30,12 @@ const cleanUpGames = async () => {
       }
   };
 
-// Execute the cleanup function on startup
-cleanUpGames();
-
 
 // Test the connection when starting up
 testConnection();
+
+// Execute the cleanup function on startup
+cleanUpGames();
+
 
 module.exports = connection;

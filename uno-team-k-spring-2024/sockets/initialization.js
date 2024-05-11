@@ -47,6 +47,13 @@ const init = (httpServer, app) => {
                 timestamp,
             });
         });
+        
+        socket.on('startGame', ({ gameId }) => {
+            // Perform validation and start the game
+            Games.startGame({ gameId }).then(() => {
+              io.emit(`gameStarted:${gameId}`);
+            });
+        });
     });
 
     app.io = io;
