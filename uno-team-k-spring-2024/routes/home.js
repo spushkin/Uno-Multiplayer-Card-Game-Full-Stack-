@@ -67,7 +67,7 @@ router.post("/generatePrivateGame", (request, response) => {
 
 	Games.createPrivateGame({ userId, code, maxPlayers })
 		.then((res) => {
-			response.redirect(`/home/game/` + res);
+			response.redirect(`/home/lobby/` + res);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
 });
@@ -185,68 +185,72 @@ router.get("/game/:id", async (request, response) => {
 		seat: userSeat.seat,
 	});
 
-	// await sleep(3000);
+	await sleep(3000);
 
-	// if (game.number === game.max_players) {
-	// 	if (!gameStarted) {
-	// 		for (let seat = 1; seat <= game.max_players; seat++) {
-	// 			const cardsForSeat = [];
-	// 			for (let card = 0; card < 7; card++) {
-	// 				const unusedCards = await Games.getUnusedCards({ gameId });
-	// 				const card =
-	// 					unusedCards[Math.floor(Math.random() * unusedCards.length)];
-	// 				await Games.giveCardToPlayer({
-	// 					gameId,
-	// 					cardId: card.id,
-	// 					seat,
-	// 				});
-	// 				cardsForSeat.push(card);
-	// 			}
+	if (game.number >= 2) {
+		if (!gameStarted) {
+			for (let seat = 1; seat <= game.max_players; seat++) {
+				console.log(seat);
+				const cardsForSeat = [];
+				for (let index = 0; index < 7; index++) {
+					const unusedCards = await Games.getUnusedCards({ gameId });
+					if (unusedCards.length === 0) {
+						console.error("No unused cards available.");
+						break; // Exit the loop or handle this scenario appropriately
+					}
+					const card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
+					await Games.giveCardToPlayer({
+						gameId,
+						cardId: card.id,
+						seat,
+					});
+					cardsForSeat.push(card);
+				}
 
-	// 			request.app.io.emit(`setPlayerCards:${gameId}`, {
-	// 				gameId,
-	// 				seat,
-	// 				cards: cardsForSeat,
-	// 			});
-	// 		}
+				request.app.io.emit(`setPlayerCards:${gameId}`, {
+					gameId,
+					seat,
+					cards: cardsForSeat,
+				});
+			}
 
-	// 		const unusedCards = await Games.getUnusedCards({ gameId });
-	// 		let card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
-	// 		while (card.type > 9) {
-	// 			card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
-	// 		}
-	// 		await Games.updateCurrentCard({ gameId, currentCard: card.id });
-	// 		request.app.io.emit(`setCurrentCard:${gameId}`, {
-	// 			card,
-	// 		});
+			const unusedCards = await Games.getUnusedCards({ gameId });
+			let card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
+			while (card.type > 9) {
+				card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
+			}
+			await Games.updateCurrentCard({ gameId, currentCard: card.id });
+			request.app.io.emit(`setCurrentCard:${gameId}`, {
+				card,
+			});
 
-	// 		request.app.io.emit(`setTurnPlayer:${gameId}`, {
-	// 			seat: 1,
-	// 		});
-	// 	} else {
-	// 		for (let seat = 1; seat <= game.max_players; seat++) {
-	// 			const cards = await Games.getSeatCards({
-	// 				gameId,
-	// 				seat,
-	// 			});
-	// 			request.app.io.emit(`setPlayerCards:${gameId}`, {
-	// 				gameId,
-	// 				seat,
-	// 				cards: cards,
-	// 			});
-	// 		}
+			request.app.io.emit(`setTurnPlayer:${gameId}`, {
+				seat: 1,
+			});
+		} else {
+			for (let seat = 1; seat <= game.max_players; seat++) {
+				const cards = await Games.getSeatCards({
+					gameId,
+					seat,
+				});
+				request.app.io.emit(`setPlayerCards:${gameId}`, {
+					gameId,
+					seat,
+					cards: cards,
+				});
+			}
 
-	// 		const seat = await Games.getCurrentSeat({ gameId });
-	// 		request.app.io.emit(`setTurnPlayer:${gameId}`, {
-	// 			seat: seat.seat,
-	// 		});
+			const seat = await Games.getCurrentSeat({ gameId });
+			request.app.io.emit(`setTurnPlayer:${gameId}`, {
+				seat: seat.seat,
+			});
 
-	// 		const currentCard = await Games.getGameCurrentCard({ gameId });
-	// 		request.app.io.emit(`setCurrentCard:${gameId}`, {
-	// 			card: currentCard,
-	// 		});
-	// 	}
-	// }
+			const currentCard = await Games.getGameCurrentCard({ gameId });
+			request.app.io.emit(`setCurrentCard:${gameId}`, {
+				card: currentCard,
+			});
+		}
+	}
 });
 
 module.exports = router;

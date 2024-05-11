@@ -19,7 +19,6 @@ const cleanUpGames = async () => {
         await connection.tx(async (t) => {
           // Execute multiple queries within the transaction
           await t.none('DELETE FROM games');
-          await t.none('DELETE FROM cards');
           await t.none('DELETE FROM game_cards');
           await t.none('DELETE FROM game_users');
 

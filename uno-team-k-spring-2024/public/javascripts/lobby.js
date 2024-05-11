@@ -7,7 +7,9 @@ const gameId = parseInt(document.querySelector("#gameIdSpan").innerText);
 const ownSeat = parseInt(document.querySelector("#seatSpan").innerText);
 const userId = parseInt(document.querySelector("#userIdSpan").innerText);
 
-
+gameSocket.on('connect', function() {
+  gameSocket.emit('joinGame', gameId);
+});
 
 // Add event listener to leave the game
 const startGameButton = document.querySelector("#startGameButton"); // Add an element with this ID

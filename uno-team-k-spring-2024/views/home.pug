@@ -45,9 +45,10 @@ html
                     b created
                     br
                     | #{game.createdAt}
-                  form.mx-1(action="/home/join/" + game.id method="post")
-                    input.btn.btn-success(type="submit" value="join")
+                  form(id="joinGameForm-" + game.id class="mx-1" action="/home/join/" + game.id method="post")
+                    input(type="submit" class="btn btn-success" value="Join")
+            
 
           //h2 This is home
   include footer.pug
-
+  script( src="/javascripts/home.js")
