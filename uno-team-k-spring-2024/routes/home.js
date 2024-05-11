@@ -83,34 +83,46 @@ router.post("/joinPrivateGame", (request, response) => {
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
+// Route to handle the join logic
 router.post("/join/:id", async (request, response) => {
-	const { username, userId } = request.session;
-	const gameId = request.params.id;
+    const { userId } = request.session;
+    const gameId = request.params.id;
 
-	const game = await Games.getGame({
-		game_id: gameId,
+  Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
+  	.then((res) => {
+		response.redirect(`/home/lobbySub/${res}`);
+	})
+	.catch(handleNewPublicGameError(response, "/home"));
 	});
-	
-	try {
-	  await Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) });
-	  const userSeat = await Games.getPlayerSeat({ gameId, userId });
-	  console.log(userSeat);
-	  const players = await Games.getPlayersByGameId({ gameId });
-	  console.log(players);
-	  response.render("lobby", {
-        username: username,
-        title: "Lobby",
-        userId: userId,
-        gameId: gameId,
-        seat: userSeat,
-        maxPlayers: game.max_players,
-		players: players
-    });
-} catch (error) {
-	console.log(error);
-	response.redirect("/home");
-}
-  });
+
+// Route to render the lobby after joining
+router.get("/lobbySub/:id", async (request, response) => {
+    const { username, userId } = request.session;
+    const gameId = request.params.id;
+	console.log("---------------------------------------------");
+    try {
+        const game = await Games.getGame({
+            game_id: gameId,
+        });
+        const userSeat = await Games.getPlayerSeat({ gameId, userId });
+        console.log(userSeat);
+        const players = await Games.getPlayersByGameId({ gameId });
+        console.log("players");
+
+        response.render("lobby", {
+            username: username,
+            title: "Lobby",
+            userId: userId,
+            gameId: gameId,
+            seat: userSeat,
+            maxPlayers: game.max_players,
+            players: players
+        });
+    } catch (error) {
+        console.log(error);
+        response.redirect("/home");
+    }
+});
 
 
 router.get("/lobby/:id", async (request, response) => {

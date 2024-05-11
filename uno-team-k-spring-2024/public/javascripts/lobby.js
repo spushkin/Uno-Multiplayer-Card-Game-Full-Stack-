@@ -1,12 +1,16 @@
 const gameSocket = io();
 
+
+
 // Retrieve userId from the hidden span
 const gameId = parseInt(document.querySelector("#gameIdSpan").innerText);
 const ownSeat = parseInt(document.querySelector("#seatSpan").innerText);
 const userId = parseInt(document.querySelector("#userIdSpan").innerText);
 
+
+
 // Add event listener to leave the game
-const startGameButton = document.querySelector("#leaveGameButton"); // Add an element with this ID
+const startGameButton = document.querySelector("#startGameButton"); // Add an element with this ID
 
 // Add event listener to leave the game
 const leaveGameButton = document.querySelector("#leaveGameButton"); // Add an element with this ID
@@ -31,10 +35,13 @@ if (leaveGameButtonOwner) {
 
   if (startGameButton) {
     startGameButton.addEventListener("click", () => {
-      gameSocket.emit("startGame", { gameId, userId });
+      console.log("emitting");
+      gameSocket.emit("startGame", { gameId});
+      console.log("emitted");
     });
   }
 
   gameSocket.on('gameStarted', ({ gameId }) => {
+    console.log("Almost");
     window.location.href = `/home/game/${gameId}`;
 });

@@ -26,7 +26,7 @@ const ADD_USER_SQL =
 	"(SELECT (SELECT COALESCE((SELECT seat FROM game_users WHERE game_id = ${game_id} ORDER BY seat DESC LIMIT 1), 0))+1)) RETURNING game_id";
 
 const REMOVE_USER_SQL =
-	"DELETE FROM game_users WHERE game_id = ${gameId} AND user_id=${user_id}";
+	"DELETE FROM game_users WHERE game_id = ${gameId} AND user_id=${userId}";
 
 const DECREASE_GAME_PLAYERS_COUNT =
 	"update games set number=number-1 where id=${game_id}";
@@ -201,6 +201,7 @@ const joinPublicGame = ({ userId, gameId }) => {
 		.then(() => db.one(ADD_USER_SQL, { game_id: gameId, userId }))
 		.then(() => {
 			db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: gameId });
+			return gameId;
 		});
 };
 
@@ -267,7 +268,7 @@ const getPlayerSeat = ({ gameId, userId }) => {
 };
 
 const removePlayerFromGame = ({ gameId, userId }) => {
-	return db.result(REMOVE_USER_SQL, { gameId: gameId, user_id: userId });
+	return db.result(REMOVE_USER_SQL, { gameId, userId });
 
 };
 

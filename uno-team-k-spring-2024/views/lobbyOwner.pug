@@ -22,8 +22,8 @@ html
               li= player.user_id
 
           // Add the "start Game" button
-          form(action="/home/startGame/" + gameId method="post")
-              button.btn.btn-primary(type="submit") Start Game
+          .startGameBtn
+            button.btn.btn-success.btn-lg#startGameButton(type="button") Start Game
           
           // Add the "Leave Game" button
           .leaveGameBtn
