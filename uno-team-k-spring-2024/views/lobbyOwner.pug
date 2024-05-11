@@ -1,0 +1,33 @@
+doctype html
+html
+  include head.pug
+  include navbar.pug
+  body
+    .wrapper
+      include chat.pug
+      .content
+        .main
+          span#userIdSpan(style="display: none") #{userId}
+          span#gameIdSpan(style="display: none") #{gameId}
+          span#seatSpan(style="display: none") #{seat}
+          
+          #lobby
+          h1 Lobby
+          p Game ID: #{gameId}
+          p Max Players: #{maxPlayers}
+          p Current Players: #{players.length}
+
+          ul
+            each player in players
+              li= player.user_id
+
+          // Add the "start Game" button
+          .startGameBtn
+            button.btn.btn-success.btn-lg#startGameButton(type="button") Start Game
+          
+          // Add the "Leave Game" button
+          .leaveGameBtn
+            button.btn.btn-danger.btn-lg#leaveGameButtonOwner(type="button") Leave Game
+
+  include footer.pug
+  script(src="/javascripts/lobby.js")

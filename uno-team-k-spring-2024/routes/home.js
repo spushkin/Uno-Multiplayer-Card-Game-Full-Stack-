@@ -44,62 +44,20 @@ router.get("/", (request, response) => {
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
-router.get("/mygames", (request, response) => {
-	const { username, userId } = request.session;
-
-	Games.getMyGames({ userId })
-		.then((games) => {
-			games.forEach((game) => {
-				game.createdAt = moment(game.createdAt).fromNow();
-			});
-
-			let tt = games ? games : [];
-
-			response.render("my-games", {
-				username,
-				userId,
-				games: games ? games : [],
-				title: "Active Games",
-			});
-		})
-
-		.catch(handleNewPublicGameError(response, "/home"));
-});
-
-router.get("/create", (request, response) => {
-	const { username, userId } = request.session;
-
-	Games.getGamesByUserId({ userId })
-		.then((games) => {
-			games.forEach((game) => {
-				game.createdAt = moment(game.createdAt).fromNow();
-			});
-
-			response.render("create-main", {
-				username,
-				userId,
-				games: games ? games : [],
-				title: "Home",
-			});
-		})
-
-		.catch(handleNewPublicGameError(response, "/home"));
-});
-
 const handleNewPublicGameError = (response, redirectUri) => (error) => {
 	console.log({ error });
 	response.redirect(redirectUri);
 };
 
 router.post("/generatePublicGame", (request, response) => {
-	const { userId } = request.session;
-	const { maxPlayers } = request.body;
+    const { userId } = request.session;
+    const { maxPlayers } = request.body;
 
-	Games.createPublicGame({ userId, maxPlayers })
-		.then((res) => {
-			response.redirect(`/home/game/` + res);
-		})
-		.catch(handleNewPublicGameError(response, "/home"));
+    Games.createPublicGame({ userId, maxPlayers })
+        .then((res) => {
+            response.redirect(`/home/lobby/${res}`);
+        })
+        .catch(handleNewPublicGameError(response, "/home"));
 });
 
 router.post("/generatePrivateGame", (request, response) => {
@@ -109,7 +67,7 @@ router.post("/generatePrivateGame", (request, response) => {
 
 	Games.createPrivateGame({ userId, code, maxPlayers })
 		.then((res) => {
-			response.redirect(`/home/game/` + res);
+			response.redirect(`/home/lobby/` + res);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
 });
@@ -125,15 +83,75 @@ router.post("/joinPrivateGame", (request, response) => {
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
-router.post("/join/:id", (request, response) => {
-	const { userId } = request.session;
-	const gameId = request.params.id;
+// Route to handle the join logic
+router.post("/join/:id", async (request, response) => {
+    const { userId } = request.session;
+    const gameId = request.params.id;
 
-	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
-		.then((res) => {
-			response.redirect(`/home/game/${gameId}`);
-		})
-		.catch(handleNewPublicGameError(response, "/home"));
+  Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
+  	.then((res) => {
+		response.redirect(`/home/lobbySub/${res}`);
+	})
+	.catch(handleNewPublicGameError(response, "/home"));
+	});
+
+// Route to render the lobby after joining
+router.get("/lobbySub/:id", async (request, response) => {
+    const { username, userId } = request.session;
+    const gameId = request.params.id;
+	console.log("---------------------------------------------");
+    try {
+        const game = await Games.getGame({
+            game_id: gameId,
+        });
+        const userSeat = await Games.getPlayerSeat({ gameId, userId });
+        console.log(userSeat);
+        const players = await Games.getPlayersByGameId({ gameId });
+        console.log("players");
+
+        response.render("lobby", {
+            username: username,
+            title: "Lobby",
+            userId: userId,
+            gameId: gameId,
+            seat: userSeat,
+            maxPlayers: game.max_players,
+            players: players
+        });
+    } catch (error) {
+        console.log(error);
+        response.redirect("/home");
+    }
+});
+
+
+router.get("/lobby/:id", async (request, response) => {
+    const { username, userId } = request.session;
+    const gameId = request.params.id;
+	try {
+	const players = await Games.getPlayersByGameId({ gameId }); 
+	console.log(players);
+    const game = await Games.getGame({ game_id: gameId });
+    const userSeat = await Games.getPlayerSeat({ gameId, userId });
+	console.log(userSeat);
+    if (!game) {
+        // Handle invalid game ID
+        return response.redirect("/home");
+    }
+
+    response.render("lobbyOwner", {
+        username: username,
+        title: "Lobby",
+        userId: userId,
+        gameId: gameId,
+        seat: userSeat,
+        maxPlayers: game.max_players,
+		players: players
+    });
+} catch (error) {
+	console.log(error);
+	response.redirect("/home");
+}
 });
 
 router.get("/game/:id", async (request, response) => {
@@ -169,14 +187,18 @@ router.get("/game/:id", async (request, response) => {
 
 	await sleep(3000);
 
-	if (game.number === game.max_players) {
+	if (game.number >= 2) {
 		if (!gameStarted) {
 			for (let seat = 1; seat <= game.max_players; seat++) {
+				console.log(seat);
 				const cardsForSeat = [];
-				for (let card = 0; card < 7; card++) {
+				for (let index = 0; index < 7; index++) {
 					const unusedCards = await Games.getUnusedCards({ gameId });
-					const card =
-						unusedCards[Math.floor(Math.random() * unusedCards.length)];
+					if (unusedCards.length === 0) {
+						console.error("No unused cards available.");
+						break; // Exit the loop or handle this scenario appropriately
+					}
+					const card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
 					await Games.giveCardToPlayer({
 						gameId,
 						cardId: card.id,

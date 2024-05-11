@@ -96,6 +96,7 @@ if (leaveGameButton) {
     // Emit the leaveGame event to the server, including gameId and userId
     gameSocket.emit("leaveGame", { gameId, userId });
     // Redirect to the home page or any other desired page
+    console.log("Byyyyyyyyye");
     window.location.href = "/home";
   });
 }

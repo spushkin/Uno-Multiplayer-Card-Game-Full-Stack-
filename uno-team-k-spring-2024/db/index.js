@@ -1,3 +1,4 @@
+require("dotenv").config();
 const pgp = require("pg-promise")();
 const connection = pgp(process.env.DATABASE_URL);
 
@@ -18,7 +19,6 @@ const cleanUpGames = async () => {
         await connection.tx(async (t) => {
           // Execute multiple queries within the transaction
           await t.none('DELETE FROM games');
-          await t.none('DELETE FROM cards');
           await t.none('DELETE FROM game_cards');
           await t.none('DELETE FROM game_users');
 
@@ -29,11 +29,12 @@ const cleanUpGames = async () => {
       }
   };
 
-// Execute the cleanup function on startup
-cleanUpGames();
-
 
 // Test the connection when starting up
 testConnection();
+
+// Execute the cleanup function on startup
+cleanUpGames();
+
 
 module.exports = connection;
