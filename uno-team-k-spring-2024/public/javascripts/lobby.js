@@ -37,14 +37,11 @@ if (leaveGameButtonOwner) {
 
   if (startGameButton) {
     startGameButton.addEventListener("click", () => {
-      console.log("emitting");
       gameSocket.emit("startGame", { gameId});
-      console.log("emitted");
     });
   }
 
   gameSocket.on('gameStarted', ({ gameId }) => {
-    console.log("Almost");
     window.location.href = `/home/game/${gameId}`;
 });
 

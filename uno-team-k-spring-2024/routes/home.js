@@ -99,15 +99,12 @@ router.post("/join/:id", async (request, response) => {
 router.get("/lobbySub/:id", async (request, response) => {
     const { username, userId } = request.session;
     const gameId = request.params.id;
-	console.log("---------------------------------------------");
     try {
         const game = await Games.getGame({
             game_id: gameId,
         });
         const userSeat = await Games.getPlayerSeat({ gameId, userId });
-        console.log(userSeat);
         const players = await Games.getPlayersByGameId({ gameId });
-        console.log("players");
 
         response.render("lobby", {
             username: username,
@@ -130,10 +127,8 @@ router.get("/lobby/:id", async (request, response) => {
     const gameId = request.params.id;
 	try {
 	const players = await Games.getPlayersByGameId({ gameId }); 
-	console.log(players);
     const game = await Games.getGame({ game_id: gameId });
     const userSeat = await Games.getPlayerSeat({ gameId, userId });
-	console.log(userSeat);
     if (!game) {
         // Handle invalid game ID
         return response.redirect("/home");
@@ -190,7 +185,6 @@ router.get("/game/:id", async (request, response) => {
 	if (game.number >= 2) {
 		if (!gameStarted) {
 			for (let seat = 1; seat <= game.max_players; seat++) {
-				console.log(seat);
 				const cardsForSeat = [];
 				for (let index = 0; index < 7; index++) {
 					const unusedCards = await Games.getUnusedCards({ gameId });
