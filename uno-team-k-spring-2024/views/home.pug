@@ -4,7 +4,7 @@ html
   include navbar.pug
   body
     .wrapper
-    
+      include chat-global.pug
       .content
         #createGame
          h1 Create a game:
@@ -52,3 +52,4 @@ html
           //h2 This is home
   include footer.pug
   script( src="/javascripts/home.js")
+  script(src="/javascripts/global.js")
