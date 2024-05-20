@@ -2,7 +2,7 @@ const db = require("./index");
 const bcrypt = require("bcrypt");
 
 const CREATE_PUBLIC =
-	'INSERT INTO games ("userId", max_players) VALUES (${userId}, ${maxPlayers}) RETURNING id';
+	'INSERT INTO games ("userId", max_players, current_card) VALUES (${userId}, ${maxPlayers}, 7) RETURNING id';
 
 const CREATE_PRIVATE =
 	'INSERT INTO games ("userId", "isPrivate", "joinCode", max_players) VALUES (${userId}, true, ${joinCode}, ${maxPlayers}) RETURNING id';
@@ -54,7 +54,6 @@ const GET_CURRENT_PLAYER =
 const SET_CURRENT_SEAT =
 	"UPDATE game_users SET current = ${current} WHERE game_id = ${gameId} AND seat = ${seat}";
 
-
 const GET_PLAYER_SEAT =
 	"SELECT seat FROM game_users WHERE game_id=${game_id} AND user_id=${user_id};";
 
@@ -86,7 +85,7 @@ const UPDATE_GAME_CURRENT_CARD =
 	"update games set current_card=${currentCard} where id=${gameId}";
 
 const GET_GAME_CURRENT_CARD =
-	"select c.id, c.type, c.color from games  JOIN cards c on c.id = games.current_card where games.id=${gameId}";
+	"select c.id, c.type, c.color from games JOIN cards c on c.id = games.current_card where games.id=${gameId}";
 
 const GET_CARD = "SELECT * FROM cards WHERE id = ${cardId}";
 
@@ -96,19 +95,20 @@ const UPDATE_GAME_DIRECTION =
 const UPDATE_GAME_LAST_COLOR_PICKED =
 	"update games set last_color_picked=${lastColorPicked} where id=${gameId}";
 
-const GET_PLAYERS_BY_GAME_ID = 
+const GET_PLAYERS_BY_GAME_ID =
 	"SELECT user_id FROM game_users WHERE game_id = ${gameId}";
 
 const getPlayersByGameId = ({ gameId }) => {
-	return db.any(GET_PLAYERS_BY_GAME_ID, { gameId })
-		.then(players => {
-		return players;
+	return db
+		.any(GET_PLAYERS_BY_GAME_ID, { gameId })
+		.then((players) => {
+			return players;
 		})
-		.catch(err => {
-		console.error('Error fetching players by game ID:', err);
-		throw err; // Rethrow the error to be handled by the calling function
+		.catch((err) => {
+			console.error("Error fetching players by game ID:", err);
+			throw err; // Rethrow the error to be handled by the calling function
 		});
-	};
+};
 
 const createPublicGame = ({ userId, maxPlayers }) => {
 	return db
@@ -269,12 +269,10 @@ const getPlayerSeat = ({ gameId, userId }) => {
 
 const removePlayerFromGame = ({ gameId, userId }) => {
 	return db.result(REMOVE_USER_SQL, { gameId, userId });
-
 };
 
-const decreasePlayerCount = ({ gameId}) => {
-	return db
-		.result(DECREASE_GAME_PLAYERS_COUNT, { game_id: gameId })
+const decreasePlayerCount = ({ gameId }) => {
+	return db.result(DECREASE_GAME_PLAYERS_COUNT, { game_id: gameId });
 };
 
 const getCurrentSeat = ({ gameId }) => {
@@ -369,5 +367,5 @@ module.exports = {
 	getCard,
 	updateGameDirection,
 	updateGameLastColorPicked,
-	removePlayerFromGame
+	removePlayerFromGame,
 };

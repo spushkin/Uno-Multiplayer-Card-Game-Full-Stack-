@@ -20,7 +20,7 @@ const playCard = async (id, color) => {
 	});
 };
 
-gameSocket.on(`setPlayerCards:${gameId}`, ({ seat, cards }) => {
+socket2.on(`setPlayerCards:${gameId}`, ({ seat, cards }) => {
 	if (seat !== ownSeat) {
 		const board = document.querySelector("#board");
 		const oldSeat = document.querySelector(`#seat-${seat}`);
@@ -56,7 +56,7 @@ gameSocket.on(`setPlayerCards:${gameId}`, ({ seat, cards }) => {
 	}
 });
 
-gameSocket.on(`setTurnPlayer:${gameId}`, ({ seat }) => {
+socket2.on(`setTurnPlayer:${gameId}`, ({ seat }) => {
 	const selfTurn = seat === ownSeat;
 
 	document.querySelector("#turnText").innerHTML = selfTurn
@@ -81,11 +81,11 @@ document.querySelector("#takeCard").addEventListener("click", async () => {
 	});
 });
 
-gameSocket.on(`endGame:${gameId}`, () => {
+socket2.on(`endGame:${gameId}`, () => {
 	window.location.href = "/home";
 });
 
-gameSocket.on(`setCurrentCard:${gameId}`, ({ card }) => {
+socket2.on(`setCurrentCard:${gameId}`, ({ card }) => {
 	const el = document.querySelector("#currentCard");
 	el.innerHTML = `<h2>Current card is:</h2> <div class="color-${card.color} type-${card.type}"></div>`;
 });
@@ -95,7 +95,7 @@ const leaveGameButton = document.querySelector("#leaveGameButton"); // Add an el
 if (leaveGameButton) {
 	leaveGameButton.addEventListener("click", () => {
 		// Emit the leaveGame event to the server, including gameId and userId
-		gameSocket.emit("leaveGame", { gameId, userId });
+		socket2.emit("leaveGame", { gameId, userId });
 		// Redirect to the home page or any other desired page
 		console.log("Byyyyyyyyye");
 		window.location.href = "/home";

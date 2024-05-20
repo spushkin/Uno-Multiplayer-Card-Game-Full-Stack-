@@ -54,6 +54,8 @@ router.post("/generatePublicGame", (request, response) => {
 
 	Games.createPublicGame({ userId, maxPlayers })
 		.then((res) => {
+			console.log(">>>>>>>>>>>");
+			console.log(`${res}`);
 			response.redirect(`/home/lobby/${res}`);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));

@@ -43,7 +43,6 @@ if (startGameButton) {
 }
 
 socket1.on("gameStarted", ({ gameId }) => {
-	console.log("Almost");
 	window.location.href = `/home/game/${gameId}`;
 });
 
