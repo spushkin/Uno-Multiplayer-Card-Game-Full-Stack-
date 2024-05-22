@@ -93,13 +93,12 @@ socket2.on(`setCurrentCard:${gameId}`, ({ card }) => {
 // Add event listener to leave the game
 const leaveGameButton = document.querySelector("#leaveGameButton"); // Add an element with this ID
 if (leaveGameButton) {
-	leaveGameButton.addEventListener("click", () => {
-		// Emit the leaveGame event to the server, including gameId and userId
-		socket2.emit("leaveGame", { gameId, userId });
-		// Redirect to the home page or any other desired page
-		console.log("Byyyyyyyyye");
-		window.location.href = "/home";
-	});
+  leaveGameButton.addEventListener("click", () => {
+    // Emit the leaveGame event to the server, including gameId and userId
+    gameSocket.emit("leaveGame", { gameId, userId });
+    // Redirect to the home page or any other desired page
+    window.location.href = "/home";
+  });
 }
 
 if (messageField1) {

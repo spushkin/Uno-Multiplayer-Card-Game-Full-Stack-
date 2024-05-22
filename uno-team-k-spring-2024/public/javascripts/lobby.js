@@ -36,9 +36,7 @@ if (leaveGameButtonOwner) {
 
 if (startGameButton) {
 	startGameButton.addEventListener("click", () => {
-		console.log("emitting");
 		socket1.emit("startGame", { gameId });
-		console.log("emitted");
 	});
 }
 

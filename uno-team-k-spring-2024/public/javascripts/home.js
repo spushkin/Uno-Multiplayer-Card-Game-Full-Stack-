@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Retrieve gameId from the form's action attribute or the form's ID
             const gameId = this.id.split('-').pop(); // Since ID is 'joinGameForm-<gameId>'
             //calling emit on button press prevents socket rejoins on refresh
+            //Probably not necessary since socketIO has robust handling but doesn't hurt
             // Emit the join game event
             gameSocket.emit('joinGame', gameId);
 
