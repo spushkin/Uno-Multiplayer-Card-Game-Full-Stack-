@@ -25,6 +25,8 @@ router.post("/:gameId", async (request, response) => {
 	}
 	const { seat } = currentPlayer;
 
+	console.log("SEAT: " + seat);
+
 	const game = await Games.getGame({
 		game_id: gameId,
 	});

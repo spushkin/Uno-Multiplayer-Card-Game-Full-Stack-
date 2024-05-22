@@ -1,6 +1,6 @@
 const express = require("express");
 const moment = require("moment");
-const crypto = require('crypto');
+const crypto = require("crypto");
 const Games = require("../db/games");
 
 const router = express.Router();
@@ -19,7 +19,6 @@ const router = express.Router();
 
 //     return result;
 // };
-
 
 function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -50,14 +49,16 @@ const handleNewPublicGameError = (response, redirectUri) => (error) => {
 };
 
 router.post("/generatePublicGame", (request, response) => {
-    const { userId } = request.session;
-    const { maxPlayers } = request.body;
+	const { userId } = request.session;
+	const { maxPlayers } = request.body;
 
-    Games.createPublicGame({ userId, maxPlayers })
-        .then((res) => {
-            response.redirect(`/home/lobby/${res}`);
-        })
-        .catch(handleNewPublicGameError(response, "/home"));
+	Games.createPublicGame({ userId, maxPlayers })
+		.then((res) => {
+			console.log(">>>>>>>>>>>");
+			console.log(`${res}`);
+			response.redirect(`/home/lobby/${res}`);
+		})
+		.catch(handleNewPublicGameError(response, "/home"));
 });
 
 router.post("/generatePrivateGame", (request, response) => {
@@ -85,68 +86,68 @@ router.post("/joinPrivateGame", (request, response) => {
 
 // Route to handle the join logic
 router.post("/join/:id", async (request, response) => {
-    const { userId } = request.session;
-    const gameId = request.params.id;
+	const { userId } = request.session;
+	const gameId = request.params.id;
 
-  Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
-  	.then((res) => {
-		response.redirect(`/home/lobbySub/${res}`);
-	})
-	.catch(handleNewPublicGameError(response, "/home"));
-	});
+	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
+		.then((res) => {
+			response.redirect(`/home/lobbySub/${res}`);
+		})
+		.catch(handleNewPublicGameError(response, "/home"));
+});
 
 // Route to render the lobby after joining
 router.get("/lobbySub/:id", async (request, response) => {
-    const { username, userId } = request.session;
-    const gameId = request.params.id;
-    try {
-        const game = await Games.getGame({
-            game_id: gameId,
-        });
-        const userSeat = await Games.getPlayerSeat({ gameId, userId });
-        const players = await Games.getPlayersByGameId({ gameId });
 
-        response.render("lobby", {
-            username: username,
-            title: "Lobby",
-            userId: userId,
-            gameId: gameId,
-            seat: userSeat,
-            maxPlayers: game.max_players,
-            players: players
-        });
-    } catch (error) {
-        console.log(error);
-        response.redirect("/home");
-    }
+	const { username, userId } = request.session;
+	const gameId = request.params.id;
+	try {
+		const game = await Games.getGame({
+			game_id: gameId,
+		});
+		const userSeat = await Games.getPlayerSeat({ gameId, userId });
+		const players = await Games.getPlayersByGameId({ gameId });
+
+		response.render("lobby", {
+			username: username,
+			title: "Lobby",
+			userId: userId,
+			gameId: gameId,
+			seat: userSeat,
+			maxPlayers: game.max_players,
+			players: players,
+		});
+	} catch (error) {
+		console.log(error);
+		response.redirect("/home");
+	}
 });
 
-
 router.get("/lobby/:id", async (request, response) => {
-    const { username, userId } = request.session;
-    const gameId = request.params.id;
+	const { username, userId } = request.session;
+	const gameId = request.params.id;
 	try {
-	const players = await Games.getPlayersByGameId({ gameId }); 
-    const game = await Games.getGame({ game_id: gameId });
-    const userSeat = await Games.getPlayerSeat({ gameId, userId });
-    if (!game) {
-        // Handle invalid game ID
-        return response.redirect("/home");
-    }
+		const players = await Games.getPlayersByGameId({ gameId });
+		const game = await Games.getGame({ game_id: gameId });
+		const userSeat = await Games.getPlayerSeat({ gameId, userId });
+		if (!game) {
+			// Handle invalid game ID
+			return response.redirect("/home");
+		}
 
-    response.render("lobbyOwner", {
-        username: username,
-        title: "Lobby",
-        userId: userId,
-        gameId: gameId,
-        seat: userSeat,
-        maxPlayers: game.max_players,
-		players: players
-    });
-} catch (error) {
-	console.log(error);
-	response.redirect("/home");
-}
+		response.render("lobbyOwner", {
+			username: username,
+			title: "Lobby",
+			userId: userId,
+			gameId: gameId,
+			seat: userSeat,
+			maxPlayers: game.max_players,
+			players: players,
+		});
+	} catch (error) {
+		console.log(error);
+		response.redirect("/home");
+	}
 });
 
 router.get("/game/:id", async (request, response) => {
@@ -192,7 +193,8 @@ router.get("/game/:id", async (request, response) => {
 						console.error("No unused cards available.");
 						break; // Exit the loop or handle this scenario appropriately
 					}
-					const card = unusedCards[Math.floor(Math.random() * unusedCards.length)];
+					const card =
+						unusedCards[Math.floor(Math.random() * unusedCards.length)];
 					await Games.giveCardToPlayer({
 						gameId,
 						cardId: card.id,

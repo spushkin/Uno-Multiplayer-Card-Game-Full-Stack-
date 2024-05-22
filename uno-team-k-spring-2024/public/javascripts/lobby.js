@@ -1,14 +1,13 @@
-const gameSocket = io();
-
-
+const socket1 = io();
+const messageField2 = document.querySelector("#message-field");
 
 // Retrieve userId from the hidden span
 const gameId = parseInt(document.querySelector("#gameIdSpan").innerText);
 const ownSeat = parseInt(document.querySelector("#seatSpan").innerText);
 const userId = parseInt(document.querySelector("#userIdSpan").innerText);
 
-gameSocket.on('connect', function() {
-  gameSocket.emit('joinGame', gameId);
+socket1.on("connect", function () {
+	socket1.emit("joinGame", gameId);
 });
 
 // Add event listener to leave the game
@@ -18,35 +17,35 @@ const startGameButton = document.querySelector("#startGameButton"); // Add an el
 const leaveGameButton = document.querySelector("#leaveGameButton"); // Add an element with this ID
 const leaveGameButtonOwner = document.querySelector("#leaveGameButtonOwner"); // Add an element with this ID
 if (leaveGameButton) {
-  leaveGameButton.addEventListener("click", () => {
-    // Emit the leaveGame event to the server, including gameId and userId
-    gameSocket.emit("leaveGame", { gameId, userId });
-    // Redirect to the home page or any other desired page
-    window.location.href = "/home";
-  });
+	leaveGameButton.addEventListener("click", () => {
+		// Emit the leaveGame event to the server, including gameId and userId
+		socket1.emit("leaveGame", { gameId, userId });
+		// Redirect to the home page or any other desired page
+		window.location.href = "/home";
+	});
 }
 
 if (leaveGameButtonOwner) {
-    leaveGameButtonOwner.addEventListener("click", () => {
-      // Emit the leaveGame event to the server, including gameId and userId
-      gameSocket.emit("leaveGameOwner", { gameId, userId });
-      // Redirect to the home page or any other desired page
-      window.location.href = "/home";
-    });
-  }
+	leaveGameButtonOwner.addEventListener("click", () => {
+		// Emit the leaveGame event to the server, including gameId and userId
+		socket1.emit("leaveGameOwner", { gameId, userId });
+		// Redirect to the home page or any other desired page
+		window.location.href = "/home";
+	});
+}
 
-  if (startGameButton) {
-    startGameButton.addEventListener("click", () => {
-      gameSocket.emit("startGame", { gameId});
-    });
-  }
+if (startGameButton) {
+	startGameButton.addEventListener("click", () => {
+		socket1.emit("startGame", { gameId });
+	});
+}
 
-  gameSocket.on('gameStarted', ({ gameId }) => {
-    window.location.href = `/home/game/${gameId}`;
+socket1.on("gameStarted", ({ gameId }) => {
+	window.location.href = `/home/game/${gameId}`;
 });
 
-if (messageField) {
-	messageField.addEventListener("keydown", (event) => {
+if (messageField2) {
+	messageField2.addEventListener("keydown", (event) => {
 		if (event.keyCode === 13) {
 			fetch(`/chat/${gameId}`, {
 				method: "post",
@@ -62,7 +61,7 @@ if (messageField) {
 
 	const messages = document.querySelector("#messages");
 
-	socket.on(`chat:${gameId}`, ({ sender, user, message, timestamp }) => {
+	socket1.on(`chat:${gameId}`, ({ sender, user, message, timestamp }) => {
 		const template = document.querySelector("#message");
 
 		const content = template.content.cloneNode(true);
