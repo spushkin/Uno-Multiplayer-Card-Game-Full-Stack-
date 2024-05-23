@@ -151,8 +151,9 @@ router.post("/:gameId", async (request, response) => {
 						cardId: newCard.id,
 						seat: seatWhoGetCardsFour,
 					});
+					cardsFour.push(newCard);
 				}
-				cardsFour.push(newCard);
+				
 
 				request.app.io.emit(`setPlayerCards:${gameId}`, {
 					gameId,
