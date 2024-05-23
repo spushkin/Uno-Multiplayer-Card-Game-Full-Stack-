@@ -5,7 +5,7 @@ html
   body
     .wrapper
       include chat.pug
-      include chat-global.pug
+      //- include chat-global.pug
       .content
         .main
           span#userIdSpan(style="display: none") #{userId}
@@ -20,7 +20,7 @@ html
 
           ul
             each player in players
-              li= player.user_id
+              li= player.user_name
 
           // Add the "start Game" button
           .startGameBtn

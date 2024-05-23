@@ -9,6 +9,10 @@ module.exports = {
 				type: Sequelize.INTEGER,
 				allowNull: false,
 			},
+			user_name: {
+				type: Sequelize.STRING,
+				allowNull: false,
+			},
 			seat: {
 				type: Sequelize.INTEGER,
 				allowNull: false,

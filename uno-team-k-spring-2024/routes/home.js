@@ -49,12 +49,10 @@ const handleNewPublicGameError = (response, redirectUri) => (error) => {
 };
 
 router.post("/generatePublicGame", (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const { maxPlayers } = request.body;
-
-	Games.createPublicGame({ userId, maxPlayers })
+	Games.createPublicGame({ userId, maxPlayers, username })
 		.then((res) => {
-			console.log(">>>>>>>>>>>");
 			console.log(`${res}`);
 			response.redirect(`/home/lobby/${res}`);
 		})
@@ -62,11 +60,11 @@ router.post("/generatePublicGame", (request, response) => {
 });
 
 router.post("/generatePrivateGame", (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const { maxPlayers } = request.body;
 	const code = Date.now();
 
-	Games.createPrivateGame({ userId, code, maxPlayers })
+	Games.createPrivateGame({ userId, username, code, maxPlayers })
 		.then((res) => {
 			response.redirect(`/home/lobby/` + res);
 		})
@@ -74,10 +72,10 @@ router.post("/generatePrivateGame", (request, response) => {
 });
 
 router.post("/joinPrivateGame", (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const { code } = request.body;
 
-	Games.joinPrivateGame({ userId, code })
+	Games.joinPrivateGame({ userId, code, username })
 		.then((res) => {
 			response.redirect(`/home/game/${res.id}`);
 		})
@@ -86,10 +84,10 @@ router.post("/joinPrivateGame", (request, response) => {
 
 // Route to handle the join logic
 router.post("/join/:id", async (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const gameId = request.params.id;
 
-	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
+	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10), username })
 		.then((res) => {
 			response.redirect(`/home/lobbySub/${res}`);
 		})

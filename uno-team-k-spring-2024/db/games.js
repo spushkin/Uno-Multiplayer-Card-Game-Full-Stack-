@@ -22,7 +22,7 @@ const GET_MY_GAMES =
 	"select * from game_users join games on game_id=id where user_id=${userId}";
 
 const ADD_USER_SQL =
-	"INSERT INTO game_users (game_id, user_id, seat) VALUES (${game_id}, ${userId}, " +
+	"INSERT INTO game_users (game_id, user_id, user_name, seat) VALUES (${game_id}, ${userId}, ${username}," +
 	"(SELECT (SELECT COALESCE((SELECT seat FROM game_users WHERE game_id = ${game_id} ORDER BY seat DESC LIMIT 1), 0))+1)) RETURNING game_id";
 
 const REMOVE_USER_SQL =
@@ -96,7 +96,8 @@ const UPDATE_GAME_LAST_COLOR_PICKED =
 	"update games set last_color_picked=${lastColorPicked} where id=${gameId}";
 
 const GET_PLAYERS_BY_GAME_ID =
-	"SELECT user_id FROM game_users WHERE game_id = ${gameId}";
+	"SELECT user_name FROM game_users WHERE game_id = ${gameId}";
+
 
 const getPlayersByGameId = ({ gameId }) => {
 	return db
@@ -106,15 +107,15 @@ const getPlayersByGameId = ({ gameId }) => {
 		})
 		.catch((err) => {
 			console.error("Error fetching players by game ID:", err);
-			throw err; // Rethrow the error to be handled by the calling function
+			throw err;
 		});
 };
 
-const createPublicGame = ({ userId, maxPlayers }) => {
+const createPublicGame = ({ userId, maxPlayers, username }) => {
 	return db
 		.one(CREATE_PUBLIC, { userId: userId, maxPlayers })
 		.then(({ id }) => {
-			db.one(ADD_USER_SQL, { game_id: id, userId });
+			db.one(ADD_USER_SQL, { game_id: id, userId, username });
 			return id;
 		})
 		.then((game_id) => {
@@ -123,7 +124,7 @@ const createPublicGame = ({ userId, maxPlayers }) => {
 		});
 };
 
-const createPrivateGame = ({ userId, code, maxPlayers }) => {
+const createPrivateGame = ({ userId, username, code, maxPlayers }) => {
 	return bcrypt.hash(toString(code), 10).then((hash) => {
 		return db
 			.one(CREATE_PRIVATE, {
@@ -132,7 +133,7 @@ const createPrivateGame = ({ userId, code, maxPlayers }) => {
 				maxPlayers,
 			})
 			.then(({ id }) => {
-				db.one(ADD_USER_SQL, { game_id: id, userId });
+				db.one(ADD_USER_SQL, { game_id: id, userId, username });
 				return id;
 			})
 			.then((game_id) => {
@@ -192,20 +193,20 @@ const getGame = ({ game_id }) => {
 	return db.one(GET_GAME, { game_id });
 };
 
-const joinPublicGame = ({ userId, gameId }) => {
+const joinPublicGame = ({ userId, gameId, username }) => {
 	return db
 		.none(LOOKUP_USER_IN_GAMEUSERS_BY_ID, {
 			game_id: gameId,
 			userId,
 		})
-		.then(() => db.one(ADD_USER_SQL, { game_id: gameId, userId }))
+		.then(() => db.one(ADD_USER_SQL, { game_id: gameId, userId, username }))
 		.then(() => {
 			db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: gameId });
 			return gameId;
 		});
 };
 
-const joinPrivateGame = ({ userId, code }) => {
+const joinPrivateGame = ({ userId, code, username }) => {
 	return db
 		.one(GET_GAMES_BY_CODE, { userId, code })
 		.then((el) => {
@@ -216,7 +217,7 @@ const joinPrivateGame = ({ userId, code }) => {
 			return el;
 		})
 		.then((el) => {
-			db.one(ADD_USER_SQL, { game_id: el.id, userId });
+			db.one(ADD_USER_SQL, { game_id: el.id, userId, username });
 			return el;
 		})
 		.then((el) => {
