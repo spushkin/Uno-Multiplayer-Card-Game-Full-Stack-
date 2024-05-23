@@ -132,7 +132,7 @@ const createPublicGame = ({ userId, maxPlayers, username }) => {
 };
 
 const createPrivateGame = ({ userId, username, code, maxPlayers }) => {
-	return bcrypt.hash(toString(code), 10).then((hash) => {
+	return bcrypt.hash(toString(code), 10).then((hash) => {//63^10 chance of duplicate codes, should implement check
 		return db
 			.one(CREATE_PRIVATE, {
 				userId: userId,

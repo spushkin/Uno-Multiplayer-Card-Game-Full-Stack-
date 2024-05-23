@@ -81,6 +81,7 @@ router.post("/joinPrivateGame", async (request, response) => {
 
 	Games.joinPrivateGame({ userId, code, username })
 		.then((res) => {
+			request.app.io.emit(`newPlayerJoin:${res.id}`);
 			response.redirect(`/home/lobbySub/${res.id}`);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
@@ -97,6 +98,7 @@ router.post("/join/:id", async (request, response) => {
 			response.redirect(`/home/lobbySub/${res}`);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
+	request.app.io.emit(`newPlayerJoin:${gameId}`);
 });
 
 // Route to render the lobby after joining

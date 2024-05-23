@@ -64,6 +64,11 @@ if (messageField2) {
 	});
 
 	const messages = document.querySelector("#messages");
+	
+
+	socket1.on(`newPlayerJoin:${gameId}`, () => {
+		location.reload();
+	});
 
 	socket1.on(`chat:${gameId}`, ({ sender, user, message, timestamp }) => {
 		const template = document.querySelector("#message");

@@ -196,8 +196,8 @@ router.post("/:gameId", async (request, response) => {
 
 		if (cards.length === 0) {
 			request.app.io.emit(`endGame:${gameId}`, {
-				redirect: `/home/lobby/${gameId}`,  // Redirect users to the lobby page
-				gamePlayedBefore: true,  // Pass whether the game was played before
+				redirect: `/home/lobby/${gameId}`,  // Redirects home, future implementation
+				gamePlayedBefore: true,             //return to lobby but need to alter cleanupGame
 				lastWinner: username
 			});
 			await Games.cleanupGame({ gameId });
