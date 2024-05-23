@@ -80,7 +80,7 @@ router.post("/:gameId", async (request, response) => {
 
 		switch (newCard.type) {
 			case 10: // draw two
-				const seatWhoGetCards = 0;
+				let seatWhoGetCards = 0;
 				if (seat===1 && game.game_direction === -1)
 					{
 						seatWhoGetCards = game.max_players;
@@ -125,7 +125,7 @@ router.post("/:gameId", async (request, response) => {
 					lastColorPicked: color,
 				});
 
-				const seatWhoGetCardsFour = 0;
+				let seatWhoGetCardsFour = 0;
 				if (seat===1 && game.game_direction === -1)
 					{
 						seatWhoGetCardsFour = game.max_players;
