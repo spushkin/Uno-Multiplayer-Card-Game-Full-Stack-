@@ -159,8 +159,8 @@ router.get("/lobby/:id", async (request, response) => {
 
 router.get("/game/:id", async (request, response) => {
 	const { username, userId } = request.session;
-
 	const gameId = request.params.id;
+	const players = await Games.getPlayersByGameId({ gameId });
 	const game = await Games.getGame({
 		game_id: gameId,
 	});
@@ -192,7 +192,7 @@ router.get("/game/:id", async (request, response) => {
 
 	if (game.number >= 2) {
 		if (!gameStarted) {
-			for (let seat = 1; seat <= game.max_players; seat++) {
+			for (let seat = 1; seat <= players.length; seat++) {
 				const cardsForSeat = [];
 				for (let index = 0; index < 7; index++) {
 					const unusedCards = await Games.getUnusedCards({ gameId });
@@ -231,7 +231,7 @@ router.get("/game/:id", async (request, response) => {
 				seat: 1,
 			});
 		} else {
-			for (let seat = 1; seat <= game.max_players; seat++) {
+			for (let seat = 1; seat <= players.length; seat++) {
 				const cards = await Games.getSeatCards({
 					gameId,
 					seat,

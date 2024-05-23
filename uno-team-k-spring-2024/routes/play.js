@@ -7,8 +7,8 @@ router.post("/:gameId", async (request, response) => {
 	const { gameId: gameIdStr } = request.params;
 	const { action, card, color } = request.body;
 	const { userId, username } = request.session;
-
 	const gameId = parseInt(gameIdStr);
+	const players = await Games.getPlayersByGameId({ gameId });
 
 	let currentPlayer;
 	try {
@@ -83,15 +83,15 @@ router.post("/:gameId", async (request, response) => {
 				let seatWhoGetCards = 0;
 				if (seat===1 && game.game_direction === -1)
 					{
-						seatWhoGetCards = game.max_players;
+						seatWhoGetCards = players.length;
 					}
-				else if(seat===game.max_players && game.game_direction === -1)
+				else if(seat===players.length && game.game_direction === -1)
 					{
 						seatWhoGetCards = seat-1;
 					}
 				else
 					{
-						seatWhoGetCards = (seat % game.max_players) + game.game_direction;
+						seatWhoGetCards = (seat % players.length) + game.game_direction;
 					}
 				const cards = await Games.getSeatCards({
 					gameId,
@@ -128,15 +128,15 @@ router.post("/:gameId", async (request, response) => {
 				let seatWhoGetCardsFour = 0;
 				if (seat===1 && game.game_direction === -1)
 					{
-						seatWhoGetCardsFour = game.max_players;
+						seatWhoGetCardsFour = players.length;
 					}
-				else if(seat===game.max_players && game.game_direction === -1)
+				else if(seat===players.length && game.game_direction === -1)
 					{
 						seatWhoGetCardsFour = seat-1;
 					}
 				else
 					{
-						seatWhoGetCardsFour = (seat % game.max_players) + game.game_direction;
+						seatWhoGetCardsFour = (seat % players.length) + game.game_direction;
 					}
 				const cardsFour = await Games.getSeatCards({
 					gameId,
@@ -196,13 +196,18 @@ router.post("/:gameId", async (request, response) => {
 
 		if (cards.length === 0) {
 			request.app.io.emit(`endGame:${gameId}`, {
-				redirect: '/lobby',  // Redirect users to the lobby page
+				redirect: `/home/lobby/${gameId}`,  // Redirect users to the lobby page
 				gamePlayedBefore: true,  // Pass whether the game was played before
 				lastWinner: username
 			});
 			await Games.cleanupGame({ gameId });
 			return;
-		} else {
+		}
+		else {
+			if(cards.length === 1)
+				{
+				request.app.io.emit(`uno:${gameId}`, {unoPlayer: username});
+				}
 			await Games.updateCurrentCard({ gameId, currentCard: card });
 			const currentCard = await Games.getGameCurrentCard({ gameId });
 			request.app.io.emit(`setCurrentCard:${gameId}`, {
@@ -222,10 +227,10 @@ router.post("/:gameId", async (request, response) => {
 
 	let nextSeat = seat + game.game_direction * seatIncrement;
 	while (nextSeat <= 0) {
-		nextSeat += game.max_players;
+		nextSeat += players.length;
 	}
-	while (nextSeat > game.max_players) {
-		nextSeat -= game.max_players;
+	while (nextSeat > players.length) {
+		nextSeat -= players.length;
 	}
 
 	await Games.updateSeatState({

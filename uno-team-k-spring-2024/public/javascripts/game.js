@@ -81,8 +81,18 @@ document.querySelector("#takeCard").addEventListener("click", async () => {
 	});
 });
 
-socket2.on(`endGame:${gameId}`, () => {
-	window.location.href = "/home";
+socket2.on(`endGame:${gameId}`, (data) => {
+    if (data.redirect) {
+        alert(`Game over! ${data.lastWinner} is the winner!`);
+        window.location.href = data.redirect;  // Redirect to the specified path
+        // Optionally, use the `data.gamePlayedBefore` to customize client behavior
+    }
+});
+
+socket2.on(`uno:${gameId}`, (data) => {
+    if (data) {
+        alert(`${data.unoPlayer} declares UNO!`);
+    }
 });
 
 socket2.on(`setCurrentCard:${gameId}`, ({ card }) => {
