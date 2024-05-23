@@ -39,10 +39,10 @@ const handleLogin =
 		response.redirect("/home");
 	};
 
-const handleLoginError = (response, redirectUri) => (error) => {
-	console.log({ error });
-	response.redirect(redirectUri);
-};
+	const handleLoginError = (response, errorMessage) => (error) => {
+		console.log({ error });
+		response.render("login", { title: "Login", error });
+	  };
 
 /* GET logout page. */
 router.get("/logout", function (request, response, next) {

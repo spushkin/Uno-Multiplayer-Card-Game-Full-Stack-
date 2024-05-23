@@ -45,6 +45,7 @@ const init = (httpServer, app) => {
                 io.to(`game:${gameId}`).emit('gameStarted', { gameId });
             } else {
                 console.log("Too few players");
+                socket.emit('tooFewPlayers', { message: "Too few players" });
             }
         });
     });

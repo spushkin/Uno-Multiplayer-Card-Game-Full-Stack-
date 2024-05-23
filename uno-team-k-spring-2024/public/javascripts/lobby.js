@@ -44,6 +44,10 @@ socket1.on("gameStarted", ({ gameId }) => {
 	window.location.href = `/home/game/${gameId}`;
 });
 
+socket1.on("tooFewPlayers", ({ message }) => {
+    alert(message);
+});
+
 if (messageField2) {
 	messageField2.addEventListener("keydown", (event) => {
 		if (event.keyCode === 13) {
