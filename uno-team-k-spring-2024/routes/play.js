@@ -6,7 +6,7 @@ const { getPlayerCards } = require("../db/games");
 router.post("/:gameId", async (request, response) => {
 	const { gameId: gameIdStr } = request.params;
 	const { action, card, color } = request.body;
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 
 	const gameId = parseInt(gameIdStr);
 
@@ -80,7 +80,19 @@ router.post("/:gameId", async (request, response) => {
 
 		switch (newCard.type) {
 			case 10: // draw two
-				const seatWhoGetCards = (seat % game.max_players) + game.game_direction;
+				const seatWhoGetCards = 0;
+				if (seat===1 && game.game_direction === -1)
+					{
+						seatWhoGetCards = game.max_players;
+					}
+				else if(seat===game.max_players && game.game_direction === -1)
+					{
+						seatWhoGetCards = seat-1;
+					}
+				else
+					{
+						seatWhoGetCards = (seat % game.max_players) + game.game_direction;
+					}
 				const cards = await Games.getSeatCards({
 					gameId,
 					seat: seatWhoGetCards,
@@ -113,8 +125,19 @@ router.post("/:gameId", async (request, response) => {
 					lastColorPicked: color,
 				});
 
-				const seatWhoGetCardsFour =
-					(seat % game.max_players) + game.game_direction;
+				const seatWhoGetCardsFour = 0;
+				if (seat===1 && game.game_direction === -1)
+					{
+						seatWhoGetCardsFour = game.max_players;
+					}
+				else if(seat===game.max_players && game.game_direction === -1)
+					{
+						seatWhoGetCardsFour = seat-1;
+					}
+				else
+					{
+						seatWhoGetCardsFour = (seat % game.max_players) + game.game_direction;
+					}
 				const cardsFour = await Games.getSeatCards({
 					gameId,
 					seat: seatWhoGetCardsFour,
@@ -171,7 +194,11 @@ router.post("/:gameId", async (request, response) => {
 		});
 
 		if (cards.length === 0) {
-			request.app.io.emit(`endGame:${gameId}`);
+			request.app.io.emit(`endGame:${gameId}`, {
+				redirect: '/lobby',  // Redirect users to the lobby page
+				gamePlayedBefore: true,  // Pass whether the game was played before
+				lastWinner: username
+			});
 			await Games.cleanupGame({ gameId });
 			return;
 		} else {
