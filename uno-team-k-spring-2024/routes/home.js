@@ -5,19 +5,23 @@ const Games = require("../db/games");
 
 const router = express.Router();
 
-// const generateUniqueShortId(games) = (length = 6) => {
+// const generateUniqueId = async (length = 6) => {
 //     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-//     let result = '';
+//     let joincode = '';
+//     let isUnique = false;
 
 //     do {
-//         result = '';
+//         joincode = '';
 //         const bytes = crypto.randomBytes(length);
 //         for (let i = 0; i < bytes.length; i++) {
-//             result += characters[bytes[i] % characters.length];
+//             joincode += characters[bytes[i] % characters.length];
 //         }
-//     } while (games.has(result)); // Ensure it's unique by checking against existing games
+//         const existingCode = await Games.checkJoinCode(joincode);
+//         isUnique = !existingCode;
+//         console.log(existingCode);
+//     } while (!isUnique);
 
-//     return result;
+//     return joincode;
 // };
 
 function sleep(ms) {
@@ -62,25 +66,26 @@ router.post("/generatePublicGame", (request, response) => {
 router.post("/generatePrivateGame", (request, response) => {
 	const { userId, username } = request.session;
 	const { maxPlayers } = request.body;
-	const code = Date.now();
-
-	Games.createPrivateGame({ userId, username, code, maxPlayers })
+	// const code = generateUniqueId();
+	// console.log(code);
+	Games.createPrivateGame({ userId, username, maxPlayers })
 		.then((res) => {
 			response.redirect(`/home/lobby/` + res);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
-router.post("/joinPrivateGame", (request, response) => {
+router.post("/joinPrivateGame", async (request, response) => {
 	const { userId, username } = request.session;
 	const { code } = request.body;
 
 	Games.joinPrivateGame({ userId, code, username })
 		.then((res) => {
-			response.redirect(`/home/game/${res.id}`);
+			response.redirect(`/home/lobbySub/${res.id}`);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
 });
+
 
 // Route to handle the join logic
 router.post("/join/:id", async (request, response) => {
@@ -114,6 +119,8 @@ router.get("/lobbySub/:id", async (request, response) => {
 			seat: userSeat,
 			maxPlayers: game.max_players,
 			players: players,
+			isPrivate: game.isPrivate,
+			joinCode: game.joinCode
 		});
 	} catch (error) {
 		console.log(error);
@@ -141,6 +148,8 @@ router.get("/lobby/:id", async (request, response) => {
 			seat: userSeat,
 			maxPlayers: game.max_players,
 			players: players,
+			isPrivate: game.isPrivate,
+			joinCode: game.joinCode
 		});
 	} catch (error) {
 		console.log(error);
@@ -158,7 +167,7 @@ router.get("/game/:id", async (request, response) => {
 
 	let gameStarted = (await Games.gameStarted({ gameId })).length > 0;
 
-	if (game.number === game.max_players && !gameStarted) {
+	if (!gameStarted) {
 		await Games.updateSeatState({
 			gameId,
 			seat: 1,

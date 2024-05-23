@@ -14,6 +14,8 @@ html
           
           #lobby
           h1 Lobby
+          if isPrivate
+            p Join Code: #{joinCode}
           p Game ID: #{gameId}
           p Max Players: #{maxPlayers}
           p Current Players: #{players.length}

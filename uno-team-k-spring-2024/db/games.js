@@ -98,6 +98,13 @@ const UPDATE_GAME_LAST_COLOR_PICKED =
 const GET_PLAYERS_BY_GAME_ID =
 	"SELECT user_name FROM game_users WHERE game_id = ${gameId}";
 
+// const CHECK_JOIN_CODE =
+// 	"SELECT id FROM games WHERE joinCode = ${joincode}";
+
+// const checkJoinCode = (joincode) => {
+// 	console.log(joincode);
+// 	return db.none(CHECK_JOIN_CODE, {joincode});
+// 	};
 
 const getPlayersByGameId = ({ gameId }) => {
 	return db
@@ -207,26 +214,34 @@ const joinPublicGame = ({ userId, gameId, username }) => {
 };
 
 const joinPrivateGame = ({ userId, code, username }) => {
-	return db
-		.one(GET_GAMES_BY_CODE, { userId, code })
-		.then((el) => {
-			db.none(LOOKUP_USER_IN_GAMEUSERS_BY_ID, {
-				game_id: el.id,
-				userId,
-			});
-			return el;
-		})
-		.then((el) => {
-			db.one(ADD_USER_SQL, { game_id: el.id, userId, username });
-			return el;
-		})
-		.then((el) => {
-			db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: el.id });
-			return el;
-		})
-		.catch((err) => {
-			return console.log(err);
-		});
+    return db
+        .one(GET_GAMES_BY_CODE, { userId, code })
+        .then((el) => {
+            return db.none(LOOKUP_USER_IN_GAMEUSERS_BY_ID, {
+                game_id: el.id,
+                userId,
+            })
+            .then(() => {
+                return el;
+            });
+        })
+        .then((el) => {
+            return db.one(ADD_USER_SQL, { game_id: el.id, userId, username })
+                .then(() => {
+                    return el;
+                });
+        })
+        .then((el) => {
+            return db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: el.id })
+                .then(() => {
+                    return el;
+                });
+        })
+        .catch((err) => {
+            // Handle errors
+            console.log(err);
+            return err;
+        });
 };
 
 const getUnusedCards = ({ gameId }) => {
@@ -369,4 +384,5 @@ module.exports = {
 	updateGameDirection,
 	updateGameLastColorPicked,
 	removePlayerFromGame,
+	// checkJoinCode
 };
