@@ -200,7 +200,7 @@ router.get("/game/:id", async (request, response) => {
 					const unusedCards = await Games.getUnusedCards({ gameId });
 					if (unusedCards.length === 0) {
 						console.error("No unused cards available.");
-						break; // Exit the loop or handle this scenario appropriately
+						break;
 					}
 					const card =
 						unusedCards[Math.floor(Math.random() * unusedCards.length)];

@@ -10,26 +10,20 @@ socket1.on("connect", function () {
 	socket1.emit("joinGame", gameId);
 });
 
-// Add event listener to leave the game
-const startGameButton = document.querySelector("#startGameButton"); // Add an element with this ID
 
-// Add event listener to leave the game
-const leaveGameButton = document.querySelector("#leaveGameButton"); // Add an element with this ID
-const leaveGameButtonOwner = document.querySelector("#leaveGameButtonOwner"); // Add an element with this ID
+const startGameButton = document.querySelector("#startGameButton");
+const leaveGameButton = document.querySelector("#leaveGameButton");
+const leaveGameButtonOwner = document.querySelector("#leaveGameButtonOwner");
 if (leaveGameButton) {
 	leaveGameButton.addEventListener("click", () => {
-		// Emit the leaveGame event to the server, including gameId and userId
 		socket1.emit("leaveGame", { gameId, userId });
-		// Redirect to the home page or any other desired page
 		window.location.href = "/home";
 	});
 }
 
 if (leaveGameButtonOwner) {
 	leaveGameButtonOwner.addEventListener("click", () => {
-		// Emit the leaveGame event to the server, including gameId and userId
 		socket1.emit("leaveGameOwner", { gameId, userId });
-		// Redirect to the home page or any other desired page
 		window.location.href = "/home";
 	});
 }
@@ -67,6 +61,15 @@ if (messageField2) {
 	
 
 	socket1.on(`newPlayerJoin:${gameId}`, () => {
+		location.reload();
+	});
+
+	socket1.on(`playerLeave:${gameId}`, () => {
+		location.reload();
+	});
+
+	socket1.on(`ownerLeave:${gameId}`, () => {
+		alert("Owner has left the game, returning home.");
 		location.reload();
 	});
 
