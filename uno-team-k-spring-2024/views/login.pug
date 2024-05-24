@@ -7,6 +7,9 @@ html
       .text-center
         h1 Login here
       .container
+        if error
+          .alert.alert-danger
+            | Invalid Credentials
         form(onsubmit='return true')#loginForm(action='/auth/login', method='post')
           .mb-3
             label.form-label(for='username')

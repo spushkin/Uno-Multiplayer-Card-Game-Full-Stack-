@@ -28,6 +28,7 @@ const init = (httpServer, app) => {
             socket.leave(`game:${gameId}`);
             await Games.removePlayerFromGame({ gameId, userId});
             await Games.decreasePlayerCount({ gameId});
+            io.emit(`playerLeave:${gameId}`);
           });
 
         socket.on("leaveGameOwner", async ({ gameId, userId }) => {
@@ -36,6 +37,7 @@ const init = (httpServer, app) => {
         if (game.userId === parseInt(userId, 10)) {
             await Games.cleanupGame({ gameId });
             io.emit(`endGame:${gameId}`);
+            io.emit(`ownerLeave:${gameId}`);
         }
         });
 
@@ -45,6 +47,7 @@ const init = (httpServer, app) => {
                 io.to(`game:${gameId}`).emit('gameStarted', { gameId });
             } else {
                 console.log("Too few players");
+                socket.emit('tooFewPlayers', { message: "Too few players" });
             }
         });
     });

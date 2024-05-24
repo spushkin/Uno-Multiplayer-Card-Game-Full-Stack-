@@ -5,19 +5,23 @@ const Games = require("../db/games");
 
 const router = express.Router();
 
-// const generateUniqueShortId(games) = (length = 6) => {
+// const generateUniqueId = async (length = 6) => {
 //     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-//     let result = '';
+//     let joincode = '';
+//     let isUnique = false;
 
 //     do {
-//         result = '';
+//         joincode = '';
 //         const bytes = crypto.randomBytes(length);
 //         for (let i = 0; i < bytes.length; i++) {
-//             result += characters[bytes[i] % characters.length];
+//             joincode += characters[bytes[i] % characters.length];
 //         }
-//     } while (games.has(result)); // Ensure it's unique by checking against existing games
+//         const existingCode = await Games.checkJoinCode(joincode);
+//         isUnique = !existingCode;
+//         console.log(existingCode);
+//     } while (!isUnique);
 
-//     return result;
+//     return joincode;
 // };
 
 function sleep(ms) {
@@ -49,12 +53,10 @@ const handleNewPublicGameError = (response, redirectUri) => (error) => {
 };
 
 router.post("/generatePublicGame", (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const { maxPlayers } = request.body;
-
-	Games.createPublicGame({ userId, maxPlayers })
+	Games.createPublicGame({ userId, maxPlayers, username })
 		.then((res) => {
-			console.log(">>>>>>>>>>>");
 			console.log(`${res}`);
 			response.redirect(`/home/lobby/${res}`);
 		})
@@ -62,38 +64,41 @@ router.post("/generatePublicGame", (request, response) => {
 });
 
 router.post("/generatePrivateGame", (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const { maxPlayers } = request.body;
-	const code = Date.now();
-
-	Games.createPrivateGame({ userId, code, maxPlayers })
+	// const code = generateUniqueId();
+	// console.log(code);
+	Games.createPrivateGame({ userId, username, maxPlayers })
 		.then((res) => {
 			response.redirect(`/home/lobby/` + res);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
-router.post("/joinPrivateGame", (request, response) => {
-	const { userId } = request.session;
+router.post("/joinPrivateGame", async (request, response) => {
+	const { userId, username } = request.session;
 	const { code } = request.body;
 
-	Games.joinPrivateGame({ userId, code })
+	Games.joinPrivateGame({ userId, code, username })
 		.then((res) => {
-			response.redirect(`/home/game/${res.id}`);
+			request.app.io.emit(`newPlayerJoin:${res.id}`);
+			response.redirect(`/home/lobbySub/${res.id}`);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
 });
 
+
 // Route to handle the join logic
 router.post("/join/:id", async (request, response) => {
-	const { userId } = request.session;
+	const { userId, username } = request.session;
 	const gameId = request.params.id;
 
-	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10) })
+	Games.joinPublicGame({ userId, gameId: parseInt(gameId, 10), username })
 		.then((res) => {
 			response.redirect(`/home/lobbySub/${res}`);
 		})
 		.catch(handleNewPublicGameError(response, "/home"));
+	request.app.io.emit(`newPlayerJoin:${gameId}`);
 });
 
 // Route to render the lobby after joining
@@ -116,6 +121,8 @@ router.get("/lobbySub/:id", async (request, response) => {
 			seat: userSeat,
 			maxPlayers: game.max_players,
 			players: players,
+			isPrivate: game.isPrivate,
+			joinCode: game.joinCode
 		});
 	} catch (error) {
 		console.log(error);
@@ -143,6 +150,8 @@ router.get("/lobby/:id", async (request, response) => {
 			seat: userSeat,
 			maxPlayers: game.max_players,
 			players: players,
+			isPrivate: game.isPrivate,
+			joinCode: game.joinCode
 		});
 	} catch (error) {
 		console.log(error);
@@ -152,15 +161,15 @@ router.get("/lobby/:id", async (request, response) => {
 
 router.get("/game/:id", async (request, response) => {
 	const { username, userId } = request.session;
-
 	const gameId = request.params.id;
+	const players = await Games.getPlayersByGameId({ gameId });
 	const game = await Games.getGame({
 		game_id: gameId,
 	});
 
 	let gameStarted = (await Games.gameStarted({ gameId })).length > 0;
 
-	if (game.number === game.max_players && !gameStarted) {
+	if (!gameStarted) {
 		await Games.updateSeatState({
 			gameId,
 			seat: 1,
@@ -185,13 +194,13 @@ router.get("/game/:id", async (request, response) => {
 
 	if (game.number >= 2) {
 		if (!gameStarted) {
-			for (let seat = 1; seat <= game.max_players; seat++) {
+			for (let seat = 1; seat <= players.length; seat++) {
 				const cardsForSeat = [];
 				for (let index = 0; index < 7; index++) {
 					const unusedCards = await Games.getUnusedCards({ gameId });
 					if (unusedCards.length === 0) {
 						console.error("No unused cards available.");
-						break; // Exit the loop or handle this scenario appropriately
+						break;
 					}
 					const card =
 						unusedCards[Math.floor(Math.random() * unusedCards.length)];
@@ -224,7 +233,7 @@ router.get("/game/:id", async (request, response) => {
 				seat: 1,
 			});
 		} else {
-			for (let seat = 1; seat <= game.max_players; seat++) {
+			for (let seat = 1; seat <= players.length; seat++) {
 				const cards = await Games.getSeatCards({
 					gameId,
 					seat,

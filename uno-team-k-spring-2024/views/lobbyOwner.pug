@@ -5,7 +5,7 @@ html
   body
     .wrapper
       include chat.pug
-      include chat-global.pug
+      //- include chat-global.pug
       .content
         .main
           span#userIdSpan(style="display: none") #{userId}
@@ -14,13 +14,15 @@ html
           
           #lobby
           h1 Lobby
+          if isPrivate
+            p Join Code: #{joinCode}
           p Game ID: #{gameId}
           p Max Players: #{maxPlayers}
           p Current Players: #{players.length}
 
           ul
             each player in players
-              li= player.user_id
+              li= player.user_name
 
           // Add the "start Game" button
           .startGameBtn

@@ -6,7 +6,7 @@ html
   body
     .wrapper
       include chat.pug
-      include chat-global.pug
+      //- include chat-global.pug
       .content
         .main
           span#userIdSpan(style="display: none") #{userId}
@@ -35,9 +35,9 @@ html
               .takeBtn
                 button.btn.btn-primary.btn-lg#takeCard(type="button" disabled="disabled") Take card
 
-              // Add the "Leave Game" button
-              .leaveGameBtn
-                button.btn.btn-danger.btn-lg#leaveGameButton(type="button") Leave Game
+              //- // Add the "Leave Game" button
+              //- .leaveGameBtn
+              //-   button.btn.btn-danger.btn-lg#leaveGameButton(type="button") Leave Game
 
   include footer.pug
   script(src="/javascripts/game.js")

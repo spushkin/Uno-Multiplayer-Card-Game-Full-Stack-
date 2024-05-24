@@ -32,6 +32,6 @@ const cleanUpGames = async () => {
 testConnection();
 
 // Execute the cleanup function on startup
-// cleanUpGames();
+cleanUpGames();
 
 module.exports = connection;

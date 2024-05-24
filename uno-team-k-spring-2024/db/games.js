@@ -22,7 +22,7 @@ const GET_MY_GAMES =
 	"select * from game_users join games on game_id=id where user_id=${userId}";
 
 const ADD_USER_SQL =
-	"INSERT INTO game_users (game_id, user_id, seat) VALUES (${game_id}, ${userId}, " +
+	"INSERT INTO game_users (game_id, user_id, user_name, seat) VALUES (${game_id}, ${userId}, ${username}," +
 	"(SELECT (SELECT COALESCE((SELECT seat FROM game_users WHERE game_id = ${game_id} ORDER BY seat DESC LIMIT 1), 0))+1)) RETURNING game_id";
 
 const REMOVE_USER_SQL =
@@ -96,7 +96,16 @@ const UPDATE_GAME_LAST_COLOR_PICKED =
 	"update games set last_color_picked=${lastColorPicked} where id=${gameId}";
 
 const GET_PLAYERS_BY_GAME_ID =
-	"SELECT user_id FROM game_users WHERE game_id = ${gameId}";
+	"SELECT user_name FROM game_users WHERE game_id = ${gameId}";
+
+
+// const CHECK_JOIN_CODE =
+// 	"SELECT id FROM games WHERE joinCode = ${joincode}";
+
+// const checkJoinCode = (joincode) => {
+// 	console.log(joincode);
+// 	return db.none(CHECK_JOIN_CODE, {joincode});
+// 	};
 
 const getPlayersByGameId = ({ gameId }) => {
 	return db
@@ -106,15 +115,15 @@ const getPlayersByGameId = ({ gameId }) => {
 		})
 		.catch((err) => {
 			console.error("Error fetching players by game ID:", err);
-			throw err; // Rethrow the error to be handled by the calling function
+			throw err;
 		});
 };
 
-const createPublicGame = ({ userId, maxPlayers }) => {
+const createPublicGame = ({ userId, maxPlayers, username }) => {
 	return db
 		.one(CREATE_PUBLIC, { userId: userId, maxPlayers })
 		.then(({ id }) => {
-			db.one(ADD_USER_SQL, { game_id: id, userId });
+			db.one(ADD_USER_SQL, { game_id: id, userId, username });
 			return id;
 		})
 		.then((game_id) => {
@@ -123,8 +132,8 @@ const createPublicGame = ({ userId, maxPlayers }) => {
 		});
 };
 
-const createPrivateGame = ({ userId, code, maxPlayers }) => {
-	return bcrypt.hash(toString(code), 10).then((hash) => {
+const createPrivateGame = ({ userId, username, code, maxPlayers }) => {
+	return bcrypt.hash(toString(code), 10).then((hash) => {//63^10 chance of duplicate codes, should implement check
 		return db
 			.one(CREATE_PRIVATE, {
 				userId: userId,
@@ -132,7 +141,7 @@ const createPrivateGame = ({ userId, code, maxPlayers }) => {
 				maxPlayers,
 			})
 			.then(({ id }) => {
-				db.one(ADD_USER_SQL, { game_id: id, userId });
+				db.one(ADD_USER_SQL, { game_id: id, userId, username });
 				return id;
 			})
 			.then((game_id) => {
@@ -192,40 +201,48 @@ const getGame = ({ game_id }) => {
 	return db.one(GET_GAME, { game_id });
 };
 
-const joinPublicGame = ({ userId, gameId }) => {
+const joinPublicGame = ({ userId, gameId, username }) => {
 	return db
 		.none(LOOKUP_USER_IN_GAMEUSERS_BY_ID, {
 			game_id: gameId,
 			userId,
 		})
-		.then(() => db.one(ADD_USER_SQL, { game_id: gameId, userId }))
+		.then(() => db.one(ADD_USER_SQL, { game_id: gameId, userId, username }))
 		.then(() => {
 			db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: gameId });
 			return gameId;
 		});
 };
 
-const joinPrivateGame = ({ userId, code }) => {
-	return db
-		.one(GET_GAMES_BY_CODE, { userId, code })
-		.then((el) => {
-			db.none(LOOKUP_USER_IN_GAMEUSERS_BY_ID, {
-				game_id: el.id,
-				userId,
-			});
-			return el;
-		})
-		.then((el) => {
-			db.one(ADD_USER_SQL, { game_id: el.id, userId });
-			return el;
-		})
-		.then((el) => {
-			db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: el.id });
-			return el;
-		})
-		.catch((err) => {
-			return console.log(err);
-		});
+const joinPrivateGame = ({ userId, code, username }) => {
+    return db
+        .one(GET_GAMES_BY_CODE, { userId, code })
+        .then((el) => {
+            return db.none(LOOKUP_USER_IN_GAMEUSERS_BY_ID, {
+                game_id: el.id,
+                userId,
+            })
+            .then(() => {
+                return el;
+            });
+        })
+        .then((el) => {
+            return db.one(ADD_USER_SQL, { game_id: el.id, userId, username })
+                .then(() => {
+                    return el;
+                });
+        })
+        .then((el) => {
+            return db.query(UPDATE_GAME_PLAYERS_COUNT, { game_id: el.id })
+                .then(() => {
+                    return el;
+                });
+        })
+        .catch((err) => {
+            // Handle errors
+            console.log(err);
+            return err;
+        });
 };
 
 const getUnusedCards = ({ gameId }) => {
@@ -267,8 +284,27 @@ const getPlayerSeat = ({ gameId, userId }) => {
 	});
 };
 
-const removePlayerFromGame = ({ gameId, userId }) => {
-	return db.result(REMOVE_USER_SQL, { gameId, userId });
+const removePlayerFromGame = async ({ gameId, userId }) => {
+	try {
+	  // Get the seat of the player to be removed
+	  const playerSeat = await db.one(GET_PLAYER_SEAT, { game_id: gameId, user_id: userId });
+	  
+	  // Remove the player
+	  await db.result(REMOVE_USER_SQL, { gameId, userId });
+  
+	  // Update the seats of the remaining players
+	  const UPDATE_SEATS_SQL = `
+		UPDATE game_users
+		SET seat = seat - 1
+		WHERE game_id = ${gameId} AND seat > ${playerSeat.seat}
+	  `;
+	  await db.none(UPDATE_SEATS_SQL);
+  
+	  return { message: "Player removed and seats updated successfully" };
+	} catch (error) {
+	  console.error("Error removing player from game:", error);
+	  throw error;
+	}
 };
 
 const decreasePlayerCount = ({ gameId }) => {
@@ -368,4 +404,5 @@ module.exports = {
 	updateGameDirection,
 	updateGameLastColorPicked,
 	removePlayerFromGame,
+	// checkJoinCode
 };

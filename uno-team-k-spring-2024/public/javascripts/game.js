@@ -4,7 +4,7 @@ const messageField1 = document.querySelector("#message-field");
 // Retrieve userId from the hidden span
 const gameId = parseInt(document.querySelector("#gameIdSpan").innerText);
 const ownSeat = parseInt(document.querySelector("#seatSpan").innerText);
-const userId = parseInt(document.querySelector("#userIdSpan").innerText); // Newly added line
+const userId = parseInt(document.querySelector("#userIdSpan").innerText);
 
 const playCard = async (id, color) => {
 	const colorElem = document.querySelector("#color");
@@ -81,8 +81,17 @@ document.querySelector("#takeCard").addEventListener("click", async () => {
 	});
 });
 
-socket2.on(`endGame:${gameId}`, () => {
-	window.location.href = "/home";
+socket2.on(`endGame:${gameId}`, (data) => {
+    if (data.redirect) {
+        alert(`Game over! ${data.lastWinner} is the winner!`);
+        window.location.href = data.redirect;
+    }
+});
+
+socket2.on(`uno:${gameId}`, (data) => {
+    if (data) {
+        alert(`${data.unoPlayer} declares UNO!`);
+    }
 });
 
 socket2.on(`setCurrentCard:${gameId}`, ({ card }) => {
@@ -90,13 +99,11 @@ socket2.on(`setCurrentCard:${gameId}`, ({ card }) => {
 	el.innerHTML = `<h2>Current card is:</h2> <div class="color-${card.color} type-${card.type}"></div>`;
 });
 
-// Add event listener to leave the game
-const leaveGameButton = document.querySelector("#leaveGameButton"); // Add an element with this ID
+const leaveGameButton = document.querySelector("#leaveGameButton");
 if (leaveGameButton) {
   leaveGameButton.addEventListener("click", () => {
     // Emit the leaveGame event to the server, including gameId and userId
     gameSocket.emit("leaveGame", { gameId, userId });
-    // Redirect to the home page or any other desired page
     window.location.href = "/home";
   });
 }
@@ -120,11 +127,9 @@ if (messageField1) {
 
 	socket2.on(`chat:${gameId}`, ({ sender, user, message, timestamp }) => {
 		const template = document.querySelector("#message");
-
 		const content = template.content.cloneNode(true);
 		content.querySelector(".sender").innerText = sender;
 		content.querySelector(".content").innerText = message;
-
 		const date = new Date(timestamp);
 
 		if (document.querySelector(`.userId-${user}`) !== null) {

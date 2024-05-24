@@ -7,7 +7,7 @@ html
       include chat-global.pug
       .content
         #createGame
-         h1 Create a game:
+         h1.game-title Create a game:
             .d-flex
             form.mx-1(action="/home/generatePublicGame" method="post")
               .form-group
@@ -25,6 +25,7 @@ html
                 input.form-control(type="text" name="code" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default")
                 input.btn.btn-primary(type="submit" value="JOIN")
           h2 Public games
+          button.btn.btn-primary(type="button" onclick="location.reload();") Search
           .my-games
             each game in games.slice().reverse()
               if game.isPrivate == false
@@ -45,9 +46,10 @@ html
                     b created
                     br
                     | #{game.createdAt}
-                  form(id="joinGameForm-" + game.id class="mx-1" action="/home/join/" + game.id method="post")
-                    input(type="submit" class="btn btn-success" value="Join")
-            
+                  if game.number < game.max_players  
+                    form(id="joinGameForm-" + game.id class="mx-1" action="/home/join/" + game.id method="post")
+                      input(type="submit" class="btn btn-success" value="Join")
+              
 
           //h2 This is home
   include footer.pug
