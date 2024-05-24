@@ -98,6 +98,7 @@ const UPDATE_GAME_LAST_COLOR_PICKED =
 const GET_PLAYERS_BY_GAME_ID =
 	"SELECT user_name FROM game_users WHERE game_id = ${gameId}";
 
+
 // const CHECK_JOIN_CODE =
 // 	"SELECT id FROM games WHERE joinCode = ${joincode}";
 
@@ -283,8 +284,27 @@ const getPlayerSeat = ({ gameId, userId }) => {
 	});
 };
 
-const removePlayerFromGame = ({ gameId, userId }) => {
-	return db.result(REMOVE_USER_SQL, { gameId, userId });
+const removePlayerFromGame = async ({ gameId, userId }) => {
+	try {
+	  // Get the seat of the player to be removed
+	  const playerSeat = await db.one(GET_PLAYER_SEAT, { game_id: gameId, user_id: userId });
+	  
+	  // Remove the player
+	  await db.result(REMOVE_USER_SQL, { gameId, userId });
+  
+	  // Update the seats of the remaining players
+	  const UPDATE_SEATS_SQL = `
+		UPDATE game_users
+		SET seat = seat - 1
+		WHERE game_id = ${gameId} AND seat > ${playerSeat.seat}
+	  `;
+	  await db.none(UPDATE_SEATS_SQL);
+  
+	  return { message: "Player removed and seats updated successfully" };
+	} catch (error) {
+	  console.error("Error removing player from game:", error);
+	  throw error;
+	}
 };
 
 const decreasePlayerCount = ({ gameId }) => {
