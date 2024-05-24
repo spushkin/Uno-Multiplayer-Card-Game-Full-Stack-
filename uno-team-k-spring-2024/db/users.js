@@ -15,7 +15,7 @@ const LOGIN_USER =
 const register = ({ username, email, password }) => {
 	return db
 		.none(LOOKUP_USER_BY_USERNAME, { username })
-		.then(() => bcrypt.hash(password, 10))
+		.then(() => bcrypt.hash(password, 15))
 		.then((hash) => db.one(REGISTER_USER, { username, password: hash }));
 };
 
