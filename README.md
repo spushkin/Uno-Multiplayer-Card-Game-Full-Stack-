@@ -2,14 +2,19 @@
 
 # Сontents
 
-- [UNO Game](#uno-game)
-- [Сontents](#сontents)
+- [Screenshots](#screenshots)
 - [About the game](#about-the-game)
+- [Tech Stack](#tech-stack)
+- [Stack diagram](#stack-diagram)
 - [Available scripts](#available-scripts)
-
+- [Build and Run Instructions](#build-and-run-instructions)
+- [Database setup](#database-setup)
+- [Run Database](#run-database)
+  
 # Screenshots
-
-
+![image](https://github.com/sfsu-csc-667-spring-2024-roberts/term-project-team-k/assets/42389366/cf6b3425-0a55-4d18-af7a-e8ed7e44ff40)
+<img width="1117" alt="Screenshot 2024-05-23 at 10 14 43 PM" src="https://github.com/sfsu-csc-667-spring-2024-roberts/term-project-team-k/assets/42389366/f3e562eb-5e0a-4d92-b756-4b08a1913a5a">
+<img width="1252" alt="Screenshot 2024-05-23 at 10 15 23 PM" src="https://github.com/sfsu-csc-667-spring-2024-roberts/term-project-team-k/assets/42389366/27726425-bf9e-4771-9331-5656e35e0eee">
 
 # About the game
 
@@ -28,6 +33,20 @@ Our UNO game follows the classic rules: each player starts with a hand of cards,
 ### Chat Functionality:
 - Global Chat: All players in the lobby can chat with each other.
 - Private Chat: Players can send private messages to each other during the game.
+
+# Tech Stack
+
+- Pug
+- Node.js
+- Express.js
+- PostgreSQL
+- CSS
+- HTML
+- JavaScript
+
+# Stack diagram
+
+![Screenshot 2024-05-23 222517](https://github.com/sfsu-csc-667-spring-2024-roberts/term-project-team-k/assets/42389366/44390990-3fdb-49a9-b4f2-ccd23902a58b)
 
 # Available scripts
 
@@ -127,7 +146,7 @@ Example of <code>.env</code>:<br>
 DATABASE_URL=postgres://usernam@localhost:5432/DATABASE_NAME
 ```
 
-# Run Datbase
+# Run Database
 
 ```
  psql -d DATABASE_NAME
