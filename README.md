@@ -1,4 +1,4 @@
-# UNO Game
+# UNO Game [Team K, Spring 2024]
 
 # Сontents
 
@@ -6,11 +6,28 @@
 - [Сontents](#сontents)
 - [About the game](#about-the-game)
 - [Available scripts](#available-scripts)
-- // TODO complete
+
+# Screenshots
+
+
 
 # About the game
 
-// TODO complete
+Our UNO game follows the classic rules: each player starts with a hand of cards, and the objective is to be the first to empty your hand by matching cards based on their number, color, or type. We've also included the action cards that can change the course of the game, such as skip, reverse, draw two, and wild cards.
+
+## Key Features:
+### User Authentication:
+- Create User: New users can create an account with a secure password.
+- Login/Logout: Users can log in and log out securely using bcrypt hashing for password storage.
+### Game Mechanics:
+- Join a Game: Users can join an existing game or create a new one.
+- Leave a Game: Players can disconnect from a game at any time without disrupting the flow.
+- Play a Card: Players can play a card that matches the top card on the discard pile by number, color, or type.
+- Draw a Card: Players can draw from the deck if they cannot play a card.
+- Declare UNO: When a player has only one card left, they can declare UNO to notify other players.
+### Chat Functionality:
+- Global Chat: All players in the lobby can chat with each other.
+- Private Chat: Players can send private messages to each other during the game.
 
 # Available scripts
 
